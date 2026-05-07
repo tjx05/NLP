@@ -1,0 +1,5 @@
+数据集（gitignore，不提交）
+
+里面分为processed和raw两个文件夹
+processed文件夹是处理过后的数据集
+raw文件夹是原始数据集
