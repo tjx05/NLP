@@ -1,7 +1,9 @@
 data/raw/*
+data/processed/*
 
 # Python 缓存
 __pycache__/
 *.pyc
 
 nlp.ipynb
+checkpoints/
