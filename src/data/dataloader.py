@@ -6,10 +6,11 @@ import torch
 from torch.utils.data import Dataset,DataLoader
 
 class GPTDataset(Dataset):
-    def __init__(self,txt,tokenizer,max_len,stride):
+    """直接接收已分词好的 token ids"""
+    def __init__(self,token_ids,max_len,stride):
         self.input_ids=[]
         self.target_ids=[]
-        token_ids=tokenizer.encode(txt)
+        # token_ids=tokenizer.encode(txt)
 
         for i in range(0,len(token_ids)-max_len,stride):
             input_chunk=token_ids[i:i+max_len]
@@ -23,8 +24,8 @@ class GPTDataset(Dataset):
     def __getitem__(self,idx):
         return self.input_ids[idx],self.target_ids[idx]
 
-def create_dataloader(txt,tokenizer,batch_size=4,max_len=256,stride=128,shuffle=True,drop_last=True):
-    dataset=GPTDataset(txt,tokenizer,max_len,stride)
+def create_dataloader(token_ids,batch_size=4,max_len=256,stride=128,shuffle=True,drop_last=True):
+    dataset=GPTDataset(token_ids,max_len,stride)
     dataloader=DataLoader(
         dataset=dataset,
         batch_size=batch_size,
