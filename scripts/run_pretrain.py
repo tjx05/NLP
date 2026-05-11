@@ -5,6 +5,11 @@ sys.path.append(str(Path(__file__).parent.parent))
 import torch
 import tiktoken
 from tqdm import tqdm
+import json
+import math
+import os
+from datetime import datetime
+
 from config import cfg
 from src.data.dataloader import create_dataloader
 from src.models.gpt_model import GPTModel
@@ -12,6 +17,13 @@ from src.utils.evaluation import calc_loss_batch,calc_loss_loader
 from src.utils.generation import generate_text_simple,generate_temp_topk,text_to_ids,ids_to_text
 
 if __name__=="__main__":
+    # 创建日志目录
+    os.makedirs("logs",exist_ok=True)
+    os.makedirs("logs/samples",exist_ok=True)
+    os.makedirs("output/plots",exist_ok=True)
+    os.makedirs("checkpoints",exist_ok=True)
+    
+
     # 加载数据
     # file_path='./data/raw/mixed_pretrain_test.txt'
     # with open(file_path,'r',encoding='utf-8') as f:
@@ -30,7 +42,7 @@ if __name__=="__main__":
     tokenizer=tiktoken.get_encoding('gpt2')
     train_loader=create_dataloader(
         train_ids,
-        batch_size=2,
+        batch_size=8,
         max_len=256,
         stride=256,
         shuffle=True,
@@ -61,6 +73,15 @@ if __name__=="__main__":
     # 优化器
     optimizer=torch.optim.AdamW(model.parameters(),lr=cfg.lr)
 
+    # 初始化历史记录
+    history = {
+        "epochs":[],
+        "train_loss":[],
+        "val_loss":[],
+        "train_ppl":[],
+        "val_ppl":[]
+    }
+
     # 训练
     epochs=cfg.epochs
     start_context='Every effort moves you'
@@ -89,11 +110,20 @@ if __name__=="__main__":
             num_batches+=1
             pbar.set_postfix({"loss":f"{epoch_loss/num_batches:.4f}"})
         
+        avg_train_loss=epoch_loss/num_batches
+        
         model.eval()
         with torch.no_grad():
             # 验证损失
             val_loss=calc_loss_loader(val_loader,model,device)
             print(f"Epoch {epoch+1}/{epochs}, Val loss {val_loss:.4f}")
+
+            # 记录历史
+            history["epochs"].append(epoch + 1)
+            history["train_loss"].append(avg_train_loss)
+            history["val_loss"].append(val_loss)
+            history["train_ppl"].append(math.exp(avg_train_loss))
+            history["val_ppl"].append(math.exp(val_loss))
 
             # 保存模型
             if val_loss<best_val_loss-min_delta:
@@ -128,8 +158,22 @@ if __name__=="__main__":
             decoded=ids_to_text(out,tokenizer)
             print(f"\n生成样本 (Epoch {epoch+1}):\n{decoded}\n")
 
+            # 保存生成样本到文件
+            # 每隔几轮保存一次，且只保存最佳 epoch
+            save_sample_freq = 3
+            if (epoch+1)%save_sample_freq==0 or val_loss<best_val_loss-min_delta:
+                with open(f"logs/samples/epoch_{epoch+1}.txt", "w", encoding="utf-8") as f:
+                    f.write(f"Epoch: {epoch+1}\n")
+                    f.write(f"Prompt: {start_context}\n\n")
+                    f.write(f"Generated:\n{decoded}\n")
+
         # 保存模型(用于恢复训练）)
         torch.save(model.state_dict(),f'./checkpoints/epoch_{epoch+1}.pth')
+
+    # 保存历史记录
+    with open("logs/history.json", "w", encoding="utf-8") as f:
+        json.dump(history, f, indent=2)
+    print("\n训练历史已保存到 logs/history.json")
 
 
 
