@@ -22,7 +22,7 @@ class Attention(nn.Module):
         self.dropout=nn.Dropout(dropout)
 
         # 掩码,注册因果mask（不参与训练，自动跟随设备）
-        self.register_buffer("mask",torch.triu(torch.ones(context_len,context_len),diagonal=1)) # 不是模型参数，不训练
+        # self.register_buffer("mask",torch.triu(torch.ones(context_len,context_len),diagonal=1)) # 不是模型参数，不训练
 
 
     def forward(self,x):
@@ -38,16 +38,23 @@ class Attention(nn.Module):
         keys=keys.transpose(1,2)
         values=values.transpose(1,2)
 
-        # 计算注意力分数
-        attn_scores=queries@keys.transpose(-2,-1)
-        attn_scores.masked_fill_(self.mask.bool()[:num_tokens,:num_tokens],-torch.inf)
-        # 缩放+softmax
-        d_k=keys.shape[-1]
-        attn_weights=torch.softmax(attn_scores/d_k**0.5,dim=-1)
-        attn_weights=self.dropout(attn_weights)
+        # # 计算注意力分数
+        # attn_scores=queries@keys.transpose(-2,-1)
+        # attn_scores.masked_fill_(self.mask.bool()[:num_tokens,:num_tokens],-torch.inf)
+        # # 缩放+softmax
+        # d_k=keys.shape[-1]
+        # attn_weights=torch.softmax(attn_scores/d_k**0.5,dim=-1)
+        # attn_weights=self.dropout(attn_weights)
 
-        # 计算上下文向量
-        context_vec=attn_weights@values
+        # # 计算上下文向量
+        # context_vec=attn_weights@values
+        
+        # flash attention
+        context_vec=torch.nn.functional.scaled_dot_product_attention(
+            queries,keys,values,
+            dropout_p=self.dropout.p if self.training else 0.0,
+            is_causal=True
+        )
 
         # 合并多头的上下文向量
         context_vec=context_vec.transpose(1,2)
