@@ -1,47 +1,66 @@
-"""
-获得数据语料
-"""
-from datasets import load_dataset
 import os
+# 设置镜像
+os.environ["HF_ENDPOINT"] = "https://hf-mirror.com"
 
-configs = [
-    {"path": "HuggingFaceFW/fineweb-edu", "name": "sample-10BT", "split": "train", "ratio": 0.50},
-    {"path": "roneneldan/TinyStories", "split": "train", "ratio": 0.30}, 
-    {"path": "wikimedia/wikipedia", "name": "20231101.en", "split": "train", "ratio": 0.20}
-]
+from datasets import load_dataset
+from tqdm import tqdm  # 导入进度条库
 
-def build_mixed_test_set(target_size_mb=500):
-    output_file = "./data/raw/mixed_pretrain_test.txt"
-    target_bytes = target_size_mb * 1024 * 1024
+def build_5b_dataset(target_tokens=5_000_000_000):
+    output_dir = "./data/raw"
+    if not os.path.exists(output_dir): os.makedirs(output_dir)
+
+    # 1个Token约3.5字节
+    target_total_bytes = target_tokens * 3.5
     
-    print(f"开始构建混合测试集，总目标大小：{target_size_mb}MB")
+    configs = [
+        {"path": "HuggingFaceFW/fineweb-edu", "name": "sample-10BT", "split": "train", "ratio": 0.50},
+        {"path": "roneneldan/TinyStories", "split": "train", "ratio": 0.30}, 
+        {"path": "wikimedia/wikipedia", "name": "20231101.en", "split": "train", "ratio": 0.20}
+    ]
+
+    file_idx = 1
+    current_file_size = 0
+    MAX_FILE_SIZE = 1024 * 1024 * 1024  # 1GB 一个分块
     
-    with open(output_file, "w", encoding="utf-8") as f:
-        for config in configs:
-            portion_bytes = target_bytes * config['ratio']
-            current_bytes = 0
+    # 开启总进度条 (以 GB 为单位)
+    total_pbar = tqdm(total=target_total_bytes, unit='B', unit_scale=True, desc="总进度")
+
+    f = open(os.path.join(output_dir, f"train_part_{file_idx}.txt"), "w", encoding="utf-8")
+
+    for config in configs:
+        portion_bytes = target_total_bytes * config['ratio']
+        downloaded_bytes = 0
+        
+        # 加载数据集
+        ds = load_dataset(config['path'], name=config.get('name'), split=config['split'], streaming=True)
+        
+        for entry in ds:
+            text = entry.get('text') or entry.get('story') or ""
+            if not text.strip(): continue
             
-            print(f"正在流式下载 {config['path']}...")
+            content = text + "\n<|endoftext|>\n"
+            line_bytes = len(content.encode('utf-8'))
             
-            ds = load_dataset(
-                config['path'], 
-                name=config.get('name'), 
-                split=config['split'], 
-                streaming=True
-            )
+            # 自动分块逻辑
+            if current_file_size + line_bytes > MAX_FILE_SIZE:
+                f.close()
+                file_idx += 1
+                f = open(os.path.join(output_dir, f"train_part_{file_idx}.txt"), "w", encoding="utf-8")
+                current_file_size = 0
+
+            f.write(content)
+            current_file_size += line_bytes
+            downloaded_bytes += line_bytes
             
-            for entry in ds:
-                text = entry.get('text') or entry.get('story') or ""
-                if not text.strip(): continue
+            # 更新进度条
+            total_pbar.update(line_bytes)
+            
+            if downloaded_bytes >= portion_bytes:
+                break
                 
-                f.write(text + "\n<|endoftext|>\n")
-                current_bytes += len(text.encode('utf-8'))
-                
-                if current_bytes >= portion_bytes:
-                    break
-                    
-    print(f"✅ 构建完成！混合语料已存至: {output_file}")
-    return output_file
+    f.close()
+    total_pbar.close()
+    print("✅ 5B语料全量拉取完成！")
 
 if __name__ == "__main__":
-    build_mixed_test_set(500)
+    build_5b_dataset()
