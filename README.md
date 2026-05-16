@@ -2,6 +2,7 @@
 NLP大作业：从零开始构建一个大语言模型
 
 ## 项目结构
+```
 NLP/
 ├── config.py # 配置文件,模型超参数（vocab_size, n_layers等）
 │
@@ -21,7 +22,7 @@ NLP/
 │ ├── models/ # 模型模块
 │ │ ├── __init__.py 
 │ │ ├── attention.py # 多头掩码注意力
-│ │ ├── transformer_block.py # Transformer组件：Transformer Block + LayerNorm + FFN
+│ │ ├── transformer_block.py # Transformer组件：Transformer Block+LayerNorm+FFN
 │ │ └── gpt_model.py # 完整GPT模型
 │ │
 │ └── utils/ # 工具模块
@@ -38,6 +39,7 @@ NLP/
 ├── checkpoints/ # 保存的模型权重
 ├── output/ # 输出结果（损失曲线、生成样例）
 └── README.md
+```
 
 ## 快速开始
 ```bash
