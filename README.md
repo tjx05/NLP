@@ -30,7 +30,8 @@ NLP/
 │   └── evaluation.py # 评估与测评
 │
 ├── scripts/ # 运行入口
-│ ├── run_pretrain.py # 预训练主脚本
+│ ├── run_pretrain.py # 预训练主脚本(单卡)
+│ ├── run_pretrain_multi.py # 分布式预训练主脚本
 │ ├── run_classifier.py # 分类微调主脚本
 │ └── run_demo.py # Gradio可视化界面
 │

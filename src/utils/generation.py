@@ -48,7 +48,7 @@ def generate_temp_topk(model,idx,max_new_tokens,context_size,temp=0,top_k=None,e
         # Top-k过滤
         if top_k is not None:
             top_logits,_=torch.topk(logits,top_k)
-            min_val=top_logits[:,-1]
+            min_val=top_logits[:,-1:]
             logits=torch.where(logits<min_val,-torch.inf,logits)
 
         # Temperature缩放
