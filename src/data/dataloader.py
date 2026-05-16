@@ -1,36 +1,54 @@
 """
 数据加载器
+数据集划分+分布式训练
 """
-import tiktoken
 import torch
-from torch.utils.data import Dataset,DataLoader
+import numpy as np
+from torch.utils.data import Dataset, DataLoader
+from torch.utils.data.distributed import DistributedSampler
 
 class GPTDataset(Dataset):
-    """直接接收已分词好的 token ids"""
-    def __init__(self,token_ids,max_len,stride):
-        self.input_ids=[]
-        self.target_ids=[]
-        # token_ids=tokenizer.encode(txt)
+    def __init__(self, bin_file, max_len, split="train", stride=None):
+        full_data=np.memmap(bin_file, dtype=np.uint16, mode='r')
+        
+        split_idx=int(0.9 * len(full_data))
+        if split=="train":
+            self.data=full_data[:split_idx]
+        else:
+            self.data=full_data[split_idx:]
+            
+        self.max_len=max_len
+        # stride 默认等于 max_len，即不重叠切分（最常用）
+        self.stride=stride if stride is not None else max_len
 
-        for i in range(0,len(token_ids)-max_len,stride):
-            input_chunk=token_ids[i:i+max_len]
-            target_chunk=token_ids[i+1:i+max_len+1]
-            self.input_ids.append(torch.tensor(input_chunk))
-            self.target_ids.append(torch.tensor(target_chunk))
-    
     def __len__(self):
-        return len(self.input_ids)
-    
-    def __getitem__(self,idx):
-        return self.input_ids[idx],self.target_ids[idx]
+        # 非重叠切分后的样本数，远小于滑窗方式
+        return (len(self.data)-self.max_len)//self.stride
 
-def create_dataloader(token_ids,batch_size=4,max_len=256,stride=128,shuffle=True,drop_last=True):
-    dataset=GPTDataset(token_ids,max_len,stride)
-    dataloader=DataLoader(
-        dataset=dataset,
+    def __getitem__(self, idx):
+        # 按 stride 定位起始位置
+        start=idx*self.stride
+        d = self.data[start : start + self.max_len + 1].astype(np.int64)
+        t = torch.from_numpy(d)
+        x = t[:-1]
+        y = t[1:]
+        return x, y
+
+def create_dataloader(bin_file, split="train", batch_size=32, max_len=1024,
+                      shuffle=True, pin_memory=True, is_distributed=False, stride=None):
+    dataset = GPTDataset(bin_file, max_len, split=split, stride=stride)
+    
+    # 如果是分布式训练，使用分布式采样器
+    sampler = DistributedSampler(dataset, shuffle=shuffle) if is_distributed else None
+    
+    dataloader = DataLoader(
+        dataset,
         batch_size=batch_size,
-        shuffle=shuffle,
-        drop_last=drop_last,
+        shuffle=False if is_distributed else shuffle, # 如果用了 sampler，必须把 Dataloader 的 shuffle 设为 False
+        sampler=sampler,
+        pin_memory=pin_memory,
+        num_workers=0,
+        drop_last=True
     )
     return dataloader
 
