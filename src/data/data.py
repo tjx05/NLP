@@ -62,5 +62,88 @@ def build_5b_dataset(target_tokens=5_000_000_000):
     total_pbar.close()
     print("✅ 5B语料全量拉取完成！")
 
+def load_instruction_data(path="D:/NLP/NLP/data/raw/instruction_data.json"):
+    #下载并加载指令数据集（教材配套，约1100条）
+    import urllib.request, os, json
+    url = "https://raw.githubusercontent.com/rasbt/LLMs-from-scratch/main/ch07/01_main-chapter-code/instruction-data.json"
+    if not os.path.exists(path):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        urllib.request.urlretrieve(url, path)
+        print(f"Downloaded to {path}")
+    with open(path, "r") as f:
+        return json.load(f)
+
+def load_alpaca_data(path="data/raw/alpaca_data.json"):
+    """斯坦福 Alpaca 完整数据集，52000条"""
+    import urllib.request, os, json
+    url = "https://raw.githubusercontent.com/tatsu-lab/stanford_alpaca/main/alpaca_data.json"
+    if not os.path.exists(path):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        urllib.request.urlretrieve(url, path)
+        print(f"Downloaded to {path}")
+    with open(path, "r") as f:
+        return json.load(f)
+
+
+
+def load_alpaca_cleaned_data(path="data/raw/alpaca_cleaned.json"):
+    """
+    Alpaca-Cleaned: 社区清洗版，约52000条，去除了噪声和重复样本
+    比原版Alpaca质量明显更高
+    """
+    import urllib.request, os, json
+    url = "https://raw.githubusercontent.com/gururise/AlpacaDataCleaned/main/alpaca_data_cleaned.json"
+    if not os.path.exists(path):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        print("Downloading Alpaca-Cleaned...")
+        urllib.request.urlretrieve(url, path)
+        print(f"Downloaded to {path}")
+    with open(path, "r") as f:
+        return json.load(f)
+
+
+def load_dolly_data(path="data/raw/dolly_data.json"):
+    """
+    Databricks Dolly-15k: 15000条人工标注，指令类型多样
+    包含问答、摘要、创意写作、信息提取等8种任务类型
+    格式需转换成统一的 instruction/input/output 格式
+    """
+    import os, json
+    os.environ["HF_ENDPOINT"] = "https://hf-mirror.com"
+
+    if not os.path.exists(path):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        print("Downloading Dolly-15k...")
+        from datasets import load_dataset
+        ds = load_dataset("databricks/databricks-dolly-15k", split="train")
+        converted = []
+        for item in ds:
+            converted.append({
+                "instruction": item["instruction"],
+                "input":       item["context"],   # dolly叫context
+                "output":      item["response"]
+            })
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(converted, f, ensure_ascii=False, indent=2)
+        print(f"Saved to {path}")
+
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def load_combined_data(alpaca_limit=5000, dolly_limit=5000):
+    """
+    混合数据集：Alpaca-Cleaned + Dolly-15k
+    两个数据集互补，覆盖更多指令类型
+    """
+    import random
+    alpaca = load_alpaca_cleaned_data()[:alpaca_limit]
+    dolly  = load_dolly_data()[:dolly_limit]
+    combined = alpaca + dolly
+    random.shuffle(combined)
+    print(f"Combined dataset: {len(alpaca)} alpaca + {len(dolly)} dolly = {len(combined)} total")
+    return combined
+
 if __name__ == "__main__":
     build_5b_dataset()
+

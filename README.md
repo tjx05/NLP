@@ -3,43 +3,48 @@ NLP大作业：从零开始构建一个大语言模型
 
 ## 项目结构
 ```
+```text
 NLP/
-├── config.py # 配置文件,模型超参数（vocab_size, n_layers等）
-│
-├── data/ # 数据集（不提交git）
-│ ├── raw/ # 原始文本
-│ └── processed/ # 预处理后的token张量
-│
-├── src/ # 核心源代码
-│ ├── __init__.py 
-│ │
-│ ├── data/ # 数据模块
-│ │ ├── __init__.py 
-│ │ ├── data.py # 获得数据语料
-│ │ ├── data_loader.py # 清洗获得的数据语料并分词
-│ │ └── dataloader.py # 接收已分词好的,创建快捷式数据加载器
-│ │
-│ ├── models/ # 模型模块
-│ │ ├── __init__.py 
-│ │ ├── attention.py # 多头掩码注意力
-│ │ ├── transformer_block.py # Transformer组件：Transformer Block+LayerNorm+FFN
-│ │ └── gpt_model.py # 完整GPT模型
-│ │
-│ └── utils/ # 工具模块
-│   ├── __init__.py 
-│   ├── generation.py # 文本生成（贪心、温度+top-k）
-│   └── evaluation.py # 评估与测评
-│
-├── scripts/ # 运行入口
-│ ├── run_pretrain.py # 预训练主脚本(单卡)
-│ ├── run_pretrain_multi.py # 分布式预训练主脚本
-│ ├── run_classifier.py # 分类微调主脚本
-│ └── run_demo.py # Gradio可视化界面
-│
-├── checkpoints/ # 保存的模型权重
-├── output/ # 输出结果（损失曲线、生成样例）
-└── README.md
-```
+├── .gitignore                   # Git 忽略配置文件
+├── README.md                    # 项目说明文档
+├── requirements.txt            # 项目依赖库列表
+├── app.py                      # Web 交互应用启动入口
+├── config.py                   # 全局参数与模型配置
+├── checkpoints/                # 模型权重及训练检查点存放目录
+├── data/                       # 数据集目录
+│   ├── processed/              # 预处理后的结构化数据
+│   └── raw/                    # 原始未处理数据
+├── output/                     # 训练产出、日志及图表
+│   └── instruct_loss_curve.png # 指令微调 Loss 训练曲线图
+├── scripts/                    # 顶层任务执行脚本
+│   ├── run_classifier.py       # 文本分类器训练脚本
+│   ├── run_instruction_fintune.py # LLM 指令微调 (Instruction Tuning) 训练脚本
+│   ├── run_instruction_test.py # 指令微调模型测试与生成效果评估
+│   ├── run_pretrain.py         # 单卡模型预训练 (Pre-train) 脚本
+│   ├── run_pretrain_multi.py   # 多卡分布式预训练脚本
+│   └── test_classifier.py      # 分类器测试评估脚本
+├── src/                        # 核心源代码目录 (Source)
+│   ├── __init__.py
+│   ├── data/                   # 数据处理与 Dataset 模块
+│   │   ├── __init__.py
+│   │   ├── cls_data.py         # 分类任务数据流处理
+│   │   ├── cls_dataloader.py   # 分类任务专用 DataLoader
+│   │   ├── data.py             # 数据处理基础类/通用函数，指令微调数据集加载
+│   │   ├── data_loader.py      # 通用数据加载逻辑
+│   │   ├── dataloader.py       # 基础 DataLoader 构建
+│   │   └── instruction_dataset.py # 指令微调 Dataset 构建与 Prompt 拼接
+│   ├── models/                 # 模型结构定义
+│   │   ├── __init__.py
+│   │   ├── attention.py        # 注意力机制实现 (Self-Attention / Masked Attention)
+│   │   ├── gpt_model.py        # GPT 模型主体网络架构
+│   │   └── transformer_block.py # Transformer Decoder Block 核心块实现
+│   └── utils/                  # 训练与推理工具函数库
+│       ├── __init__.py
+│       ├── cls_finetune.py     # 分类微调辅助工具
+│       ├── evaluation.py       # 模型指标评估 (Acc, Bleu, Rouge 等)
+│       └── generation.py       # 解码生成算法 (Top-p, Top-k, Beam Search，指令微调工具 等)
+└── templates/                  # 前端 HTML 模板目录
+    └── index.html              # Web UI 交互界面
 
 ## 快速开始
 ```bash
