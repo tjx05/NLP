@@ -1,9 +1,15 @@
-data/raw/*
-data/processed/*
+# 忽略 checkpoints 文件夹下的所有内容
+checkpoints/*
+！checkpoints/README.md
+# 忽略 data/raw 文件夹下的所有内容
+data/*
+！data/README.md
+
+
+
 
 # Python 缓存
 __pycache__/
 *.pyc
 
 nlp.ipynb
-checkpoints/

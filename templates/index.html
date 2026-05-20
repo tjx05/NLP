@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NLP-LLM 演示系统</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-primary: #ffffff;
+      --bg-secondary: #f7f7f5;
+      --bg-tertiary: #f0efec;
+      --bg-info: #e6f1fb;
+      --bg-success: #eaf3de;
+      --bg-warning: #faeeda;
+      --text-primary: #1a1a1a;
+      --text-secondary: #5f5e5a;
+      --text-tertiary: #888780;
+      --text-info: #185fa5;
+      --text-success: #3b6d11;
+      --text-warning: #854f0b;
+      --border: rgba(0,0,0,0.12);
+      --border-hover: rgba(0,0,0,0.22);
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-primary: #1e1e1c;
+        --bg-secondary: #2a2a27;
+        --bg-tertiary: #242421;
+        --bg-info: #042c53;
+        --bg-success: #173404;
+        --bg-warning: #412402;
+        --text-primary: #e8e8e4;
+        --text-secondary: #b4b2a9;
+        --text-tertiary: #888780;
+        --text-info: #85b7eb;
+        --text-success: #97c459;
+        --text-warning: #ef9f27;
+        --border: rgba(255,255,255,0.1);
+        --border-hover: rgba(255,255,255,0.2);
+      }
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── sidebar ── */
+    .sidebar {
+      width: 220px;
+      min-width: 220px;
+      background: var(--bg-secondary);
+      border-right: 0.5px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 16px 12px;
+    }
+    .logo { font-size: 15px; font-weight: 500; padding: 8px 12px; margin-bottom: 20px; }
+    .logo span { font-size: 11px; color: var(--text-tertiary); display: block; margin-top: 2px; font-weight: 400; }
+    .nav-label { font-size: 11px; color: var(--text-tertiary); padding: 0 12px; margin-bottom: 6px; letter-spacing: .05em; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 12px; border-radius: var(--radius-md);
+      cursor: pointer; font-size: 13.5px; color: var(--text-secondary);
+      transition: background .15s, color .15s;
+      margin-bottom: 2px; border: none; background: transparent;
+      width: 100%; text-align: left; font-family: var(--font);
+    }
+    .nav-item i { font-size: 16px; flex-shrink: 0; }
+    .nav-item:hover { background: var(--bg-primary); color: var(--text-primary); }
+    .nav-item.active { background: var(--bg-primary); color: var(--text-primary); font-weight: 500; }
+    .nav-item .badge {
+      margin-left: auto; font-size: 10px;
+      background: var(--bg-info); color: var(--text-info);
+      padding: 2px 7px; border-radius: 99px;
+    }
+    .sidebar-footer {
+      margin-top: auto;
+      padding-top: 12px;
+      border-top: 0.5px solid var(--border);
+      font-size: 11px; color: var(--text-tertiary);
+      line-height: 1.6;
+    }
+
+    /* ── main ── */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+    .topbar {
+      padding: 14px 24px;
+      border-bottom: 0.5px solid var(--border);
+      display: flex; align-items: center; gap: 12px;
+      background: var(--bg-primary);
+      flex-shrink: 0;
+    }
+    .topbar-title { font-size: 15px; font-weight: 500; }
+    .topbar-sub { font-size: 12px; color: var(--text-tertiary); margin-left: auto; }
+
+    /* ── panels ── */
+    .panel { display: none; flex-direction: column; flex: 1; overflow: hidden; }
+    .panel.active { display: flex; }
+
+    .chat-area {
+      flex: 1; overflow-y: auto; padding: 28px 40px;
+      display: flex; flex-direction: column; gap: 20px;
+    }
+
+    /* ── welcome ── */
+    .welcome { text-align: center; padding: 48px 24px 32px; color: var(--text-secondary); }
+    .welcome h2 { font-size: 20px; font-weight: 500; color: var(--text-primary); margin-bottom: 8px; }
+    .welcome p { font-size: 14px; line-height: 1.6; max-width: 420px; margin: 0 auto 24px; }
+    .examples { display: flex; flex-direction: column; gap: 8px; max-width: 420px; margin: 0 auto; }
+    .example-btn {
+      padding: 10px 16px; border-radius: var(--radius-md);
+      border: 0.5px solid var(--border); background: var(--bg-primary);
+      color: var(--text-secondary); font-size: 13px; cursor: pointer;
+      text-align: left; transition: background .15s, color .15s;
+      font-family: var(--font);
+    }
+    .example-btn:hover { background: var(--bg-secondary); color: var(--text-primary); }
+
+    .tag {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 11px; padding: 3px 8px; border-radius: 99px; margin-bottom: 8px;
+    }
+    .tag.pretrain { background: var(--bg-success); color: var(--text-success); }
+    .tag.classify { background: var(--bg-warning); color: var(--text-warning); }
+    .tag.instruct { background: var(--bg-info); color: var(--text-info); }
+
+    /* ── messages ── */
+    .msg { display: flex; gap: 12px; max-width: 680px; }
+    .msg.user { flex-direction: row-reverse; margin-left: auto; }
+    .avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 500; flex-shrink: 0;
+    }
+    .avatar.bot { background: var(--bg-info); color: var(--text-info); }
+    .avatar.user { background: var(--bg-secondary); color: var(--text-secondary); border: 0.5px solid var(--border); }
+    .bubble {
+      padding: 11px 16px; border-radius: var(--radius-lg);
+      font-size: 14px; line-height: 1.65; max-width: 540px; white-space: pre-wrap;
+    }
+    .bubble.bot { background: var(--bg-primary); border: 0.5px solid var(--border); }
+    .bubble.user { background: var(--bg-secondary); color: var(--text-primary); }
+    .bubble.loading { color: var(--text-tertiary); font-style: italic; }
+
+    /* ── input ── */
+    .input-area {
+      padding: 16px 40px 20px;
+      border-top: 0.5px solid var(--border);
+      background: var(--bg-primary);
+      flex-shrink: 0;
+    }
+    .input-row {
+      display: flex; gap: 10px; align-items: flex-end;
+      background: var(--bg-secondary);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg); padding: 10px 14px;
+    }
+    .input-row textarea {
+      flex: 1; border: none; background: transparent;
+      font-family: var(--font); font-size: 14px; color: var(--text-primary);
+      resize: none; outline: none; max-height: 120px; min-height: 24px; line-height: 1.5;
+    }
+    .input-row textarea::placeholder { color: var(--text-tertiary); }
+    .send-btn {
+      width: 32px; height: 32px; border-radius: var(--radius-md);
+      border: none; background: var(--text-primary); color: var(--bg-primary);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: opacity .15s;
+    }
+    .send-btn:disabled { opacity: .35; cursor: not-allowed; }
+    .send-btn i { font-size: 15px; }
+    .hint { font-size: 11px; color: var(--text-tertiary); text-align: center; margin-top: 8px; }
+  </style>
+</head>
+<body>
+
+<nav class="sidebar">
+  <div class="logo">NLP-LLM <span>从零构建大语言模型</span></div>
+  <div class="nav-label">功能模块</div>
+  <button class="nav-item active" onclick="switchPanel('pretrain', this)" id="nav-pretrain">
+    <i class="ti ti-pencil" aria-hidden="true"></i> 预训练续写
+  </button>
+  <button class="nav-item" onclick="switchPanel('classify', this)" id="nav-classify">
+    <i class="ti ti-tag" aria-hidden="true"></i> 文本分类
+    <span class="badge">2</span>
+  </button>
+  <button class="nav-item" onclick="switchPanel('instruct', this)" id="nav-instruct">
+    <i class="ti ti-message-chatbot" aria-hidden="true"></i> 指令微调
+  </button>
+  <div class="sidebar-footer">
+    基于 GPT 架构 · 8层 Transformer<br>
+    词表 50257 · 嵌入维度 768
+  </div>
+</nav>
+
+<div class="main">
+
+  <!-- 预训练续写 -->
+  <div class="panel active" id="panel-pretrain">
+    <div class="topbar">
+      <i class="ti ti-pencil" style="font-size:16px;color:var(--text-secondary)" aria-hidden="true"></i>
+      <span class="topbar-title">预训练续写</span>
+      <span class="topbar-sub">英文文本续写 · 贪心 / Top-k 采样</span>
+    </div>
+    <div class="chat-area" id="chat-pretrain">
+      <div class="welcome" id="welcome-pretrain">
+        <div class="tag pretrain"><i class="ti ti-circle-filled" style="font-size:8px" aria-hidden="true"></i> 预训练模式</div>
+        <h2>文本续写</h2>
+        <p>输入英文开头，模型将基于预训练权重自动续写后续内容，展示基础语言建模能力。</p>
+        <div class="examples">
+          <button class="example-btn" onclick="fillInput('pretrain','Hello, I am')">Hello, I am</button>
+          <button class="example-btn" onclick="fillInput('pretrain','The future of artificial intelligence')">The future of artificial intelligence</button>
+          <button class="example-btn" onclick="fillInput('pretrain','Once upon a time in a small village')">Once upon a time in a small village</button>
+        </div>
+      </div>
+    </div>
+    <div class="input-area">
+      <div class="input-row">
+        <textarea id="input-pretrain" placeholder="输入英文开头，模型将续写…" rows="1"
+          onkeydown="handleKey(event,'pretrain')" oninput="autoResize(this)"></textarea>
+        <button class="send-btn" onclick="send('pretrain')" id="btn-pretrain" aria-label="发送">
+          <i class="ti ti-arrow-up" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="hint">Enter 发送 · Shift+Enter 换行</div>
+    </div>
+  </div>
+
+  <!-- 文本分类 -->
+  <div class="panel" id="panel-classify">
+    <div class="topbar">
+      <i class="ti ti-tag" style="font-size:16px;color:var(--text-secondary)" aria-hidden="true"></i>
+      <span class="topbar-title">文本分类</span>
+      <span class="topbar-sub">垃圾邮件识别 · 情感分析</span>
+    </div>
+    <div class="chat-area" id="chat-classify">
+      <div class="welcome" id="welcome-classify">
+        <div class="tag classify"><i class="ti ti-circle-filled" style="font-size:8px" aria-hidden="true"></i> 分类微调模式</div>
+        <h2>文本分类</h2>
+        <p>输入英文文本，模型判断是否为垃圾邮件，以及情感极性（正面 / 负面）。</p>
+        <div class="examples">
+          <button class="example-btn" onclick="fillInput('classify','You have won a free prize! Click here to claim it.')">You have won a free prize! Click here to claim it.</button>
+          <button class="example-btn" onclick="fillInput('classify','I love this movie, it\'s so touching.')">I love this movie, it's so touching.</button>
+          <button class="example-btn" onclick="fillInput('classify','Your account has been selected for a special reward.')">Your account has been selected for a special reward.</button>
+        </div>
+      </div>
+    </div>
+    <div class="input-area">
+      <div class="input-row">
+        <textarea id="input-classify" placeholder="输入英文文本，进行分类判断…" rows="1"
+          onkeydown="handleKey(event,'classify')" oninput="autoResize(this)"></textarea>
+        <button class="send-btn" onclick="send('classify')" id="btn-classify" aria-label="发送">
+          <i class="ti ti-arrow-up" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="hint">Enter 发送 · Shift+Enter 换行</div>
+    </div>
+  </div>
+
+  <!-- 指令微调 -->
+  <div class="panel" id="panel-instruct">
+    <div class="topbar">
+      <i class="ti ti-message-chatbot" style="font-size:16px;color:var(--text-secondary)" aria-hidden="true"></i>
+      <span class="topbar-title">指令微调</span>
+      <span class="topbar-sub">英文指令遵循助手 · Alpaca 格式</span>
+    </div>
+    <div class="chat-area" id="chat-instruct">
+      <div class="welcome" id="welcome-instruct">
+        <div class="tag instruct"><i class="ti ti-circle-filled" style="font-size:8px" aria-hidden="true"></i> 指令微调模式</div>
+        <h2>指令遵循助手</h2>
+        <p>输入英文指令，模型将尝试理解并执行，展示指令微调后的任务遵循能力。</p>
+        <div class="examples">
+          <button class="example-btn" onclick="fillInput('instruct','Explain what a transformer is')">Explain what a transformer is</button>
+          <button class="example-btn" onclick="fillInput('instruct','Write a short sentence about the ocean')">Write a short sentence about the ocean</button>
+        </div>
+      </div>
+    </div>
+    <div class="input-area">
+      <div class="input-row">
+        <textarea id="input-instruct" placeholder="输入英文指令…" rows="1"
+          onkeydown="handleKey(event,'instruct')" oninput="autoResize(this)"></textarea>
+        <button class="send-btn" onclick="send('instruct')" id="btn-instruct" aria-label="发送">
+          <i class="ti ti-arrow-up" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="hint">Enter 发送 · Shift+Enter 换行</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const panels = ['pretrain', 'classify', 'instruct'];
+  const busy = { pretrain: false, classify: false, instruct: false };
+
+  function switchPanel(id, btn) {
+    panels.forEach(p => {
+      document.getElementById('panel-' + p).classList.remove('active');
+      document.getElementById('nav-' + p).classList.remove('active');
+    });
+    document.getElementById('panel-' + id).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  function fillInput(panel, text) {
+    const ta = document.getElementById('input-' + panel);
+    ta.value = text;
+    autoResize(ta);
+    ta.focus();
+  }
+
+  function autoResize(ta) {
+    ta.style.height = 'auto';
+    ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
+  }
+
+  function handleKey(e, panel) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(panel); }
+  }
+
+  function appendMsg(panel, role, text, isLoading = false) {
+    const area = document.getElementById('chat-' + panel);
+    const welcome = document.getElementById('welcome-' + panel);
+    if (welcome) welcome.style.display = 'none';
+
+    const wrap = document.createElement('div');
+    wrap.className = 'msg ' + role;
+
+    const av = document.createElement('div');
+    av.className = 'avatar ' + (role === 'user' ? 'user' : 'bot');
+    av.textContent = role === 'user' ? '我' : 'AI';
+
+    const bub = document.createElement('div');
+    bub.className = 'bubble ' + (role === 'user' ? 'user' : 'bot') + (isLoading ? ' loading' : '');
+    bub.textContent = text;
+
+    wrap.appendChild(av);
+    wrap.appendChild(bub);
+    area.appendChild(wrap);
+    area.scrollTop = area.scrollHeight;
+    return bub;
+  }
+
+  async function send(panel) {
+    if (busy[panel]) return;
+    const ta = document.getElementById('input-' + panel);
+    const text = ta.value.trim();
+    if (!text) return;
+    ta.value = '';
+    autoResize(ta);
+    appendMsg(panel, 'user', text);
+    busy[panel] = true;
+    document.getElementById('btn-' + panel).disabled = true;
+    const loadBub = appendMsg(panel, 'bot', '模型推理中…', true);
+
+    try {
+      // ── 对接后端：把下面的 URL 换成 Flask 实际地址 ──
+      const endpoint = {
+        pretrain: '/api/pretrain',
+        classify: '/api/classify',
+        instruct: '/api/instruct',
+      }[panel];
+
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      });
+      const data = await res.json();
+      loadBub.classList.remove('loading');
+      loadBub.textContent = data.result || '（无响应）';
+    } catch (err) {
+      // 后端未启动时显示提示，不崩溃
+      loadBub.classList.remove('loading');
+      loadBub.textContent = '⚠️ 无法连接后端，请确认 Flask 服务已启动。\n\n错误：' + err.message;
+    }
+
+    busy[panel] = false;
+    document.getElementById('btn-' + panel).disabled = false;
+    document.getElementById('chat-' + panel).scrollTop = 9999;
+  }
+</script>
+</body>
+</html>

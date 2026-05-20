@@ -10,7 +10,7 @@ import math
 import os
 from datetime import datetime
 
-from config import cfg
+from config  import cfg
 from src.data.dataloader import create_dataloader
 from src.models.gpt_model import GPTModel
 from src.utils.evaluation import calc_loss_batch,calc_loss_loader
