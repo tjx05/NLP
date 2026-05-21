@@ -244,23 +244,23 @@
     <div class="topbar">
       <i class="ti ti-tag" style="font-size:16px;color:var(--text-secondary)" aria-hidden="true"></i>
       <span class="topbar-title">文本分类</span>
-      <span class="topbar-sub">垃圾邮件识别 · 情感分析</span>
+      <span class="topbar-sub">安全合规检测 · 垃圾信息识别</span>
     </div>
     <div class="chat-area" id="chat-classify">
       <div class="welcome" id="welcome-classify">
         <div class="tag classify"><i class="ti ti-circle-filled" style="font-size:8px" aria-hidden="true"></i> 分类微调模式</div>
-        <h2>文本分类</h2>
-        <p>输入英文文本，模型判断是否为垃圾邮件，以及情感极性（正面 / 负面）。</p>
+        <h2>文本合规检测</h2>
+        <p>输入任意英文文本，底层张量网络将实时计算并判别其属于正常交互信息，还是诱导欺诈信息。</p>
         <div class="examples">
-          <button class="example-btn" onclick="fillInput('classify','You have won a free prize! Click here to claim it.')">You have won a free prize! Click here to claim it.</button>
-          <button class="example-btn" onclick="fillInput('classify','I love this movie, it\'s so touching.')">I love this movie, it's so touching.</button>
-          <button class="example-btn" onclick="fillInput('classify','Your account has been selected for a special reward.')">Your account has been selected for a special reward.</button>
+          <button class="example-btn" onclick="fillInput('classify','CONGRATULATIONS! You are a winner! Reply WIN to claim $1000 cash.')">CONGRATULATIONS! You are a winner! Reply WIN to claim $1000 cash.</button>
+          <button class="example-btn" onclick="fillInput('classify','Hey, just wanted to check if we\'re still on for dinner tonight?')">Hey, just wanted to check if we're still on for dinner tonight?</button>
+          <button class="example-btn" onclick="fillInput('classify','Your account has been selected for a special reward. Click the link.')">Your account has been selected for a special reward. Click the link.</button>
         </div>
       </div>
     </div>
     <div class="input-area">
       <div class="input-row">
-        <textarea id="input-classify" placeholder="输入英文文本，进行分类判断…" rows="1"
+        <textarea id="input-classify" placeholder="输入英文文本，进行合规安全检测…" rows="1"
           onkeydown="handleKey(event,'classify')" oninput="autoResize(this)"></textarea>
         <button class="send-btn" onclick="send('classify')" id="btn-classify" aria-label="发送">
           <i class="ti ti-arrow-up" aria-hidden="true"></i>

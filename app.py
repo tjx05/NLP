@@ -4,6 +4,7 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 import torch
+import torch.nn as nn
 import tiktoken
 from flask import Flask, request, jsonify, render_template
 
@@ -34,8 +35,31 @@ def build_model(checkpoint_name):
     print(f"  已加载: {path}")
     return model
 
+def build_classify_model(checkpoint_name):
+    """【新增】：专门用于加载分类微调模型（判别式）"""
+    model = GPTModel(
+        vocab_size=cfg.vocab_size,
+        embed_dim=cfg.embedding_dim,
+        context_len=cfg.context_len,
+        dropout=cfg.dropout,
+        num_heads=cfg.num_heads,
+        bias=cfg.bias,
+        num_layers=cfg.num_layers
+    ).to(cfg.device)
+    
+    # 核心改造：将生成头切断，换成二分类头
+    model.output = nn.Linear(cfg.embedding_dim, 2, bias=False).to(cfg.device)
+    
+    path = os.path.join(os.path.dirname(__file__), "checkpoints", checkpoint_name)
+    ckpt = torch.load(path, map_location=cfg.device, weights_only=True)
+    model.load_state_dict(ckpt)
+    model.eval()
+    print(f"  已加载分类模型: {path}")
+    return model
+
 pretrain_model  = build_model("epoch_3.pth")          # 预训练模型
-instruct_model  = build_model("instruct_epoch1.pt")   # 指令微调模型
+instruct_model  = build_model("instruct_epoch2.pt")   # 指令微调模型
+classify_model  = build_classify_model("classifier_finetuned.pth") # 【新增】：加载你的分类权
 print("模型加载完毕，服务启动中...")
 
 
@@ -91,7 +115,40 @@ def api_instruct():
 # ── 分类接口（预留，由队友对接）──
 @app.route("/api/classify", methods=["POST"])
 def api_classify():
-    return jsonify({"result": "分类接口待接入"}), 200
+    data = request.get_json(force=True)
+    text = data.get("text", "").strip()
+    if not text:
+        return jsonify({"error": "text 不能为空"}), 400
+
+    # 1. 文本转 Token ID
+    input_ids = tokenizer.encode(text)
+    
+    # 2. 截断或向右填充至 120
+    max_length = 120
+    if len(input_ids) > max_length:
+        input_ids = input_ids[:max_length]
+    else:
+        input_ids += [50256] * (max_length - len(input_ids))
+        
+    # 3. 转张量并送入设备
+    input_tensor = torch.tensor(input_ids, dtype=torch.long, device=cfg.device).unsqueeze(0)
+    
+    # 4. 推理取最后一个 Token 的输出
+    with torch.no_grad():
+        logits = classify_model(input_tensor)[:, -1, :]
+        probs = torch.nn.functional.softmax(logits, dim=-1)[0]
+        pred_label = torch.argmax(logits, dim=-1).item()
+        
+    # 5. 格式化输出字符串给前端
+    ham_prob = probs[0].item() * 100
+    spam_prob = probs[1].item() * 100
+    
+    if pred_label == 1:
+        res_str = f"🚫 垃圾/钓鱼信息 (Spam)\n\n【底层置信度】\n正常: {ham_prob:.2f}%\n垃圾: {spam_prob:.2f}%"
+    else:
+        res_str = f"✅ 正常安全信息 (Ham)\n\n【底层置信度】\n正常: {ham_prob:.2f}%\n垃圾: {spam_prob:.2f}%"
+
+    return jsonify({"result": res_str})
 
 
 if __name__ == "__main__":
