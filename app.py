@@ -36,7 +36,7 @@ def build_model(checkpoint_name):
     return model
 
 def build_classify_model(checkpoint_name):
-    """【新增】：专门用于加载分类微调模型（判别式）"""
+    """专门用于加载分类微调模型（判别式）"""
     model = GPTModel(
         vocab_size=cfg.vocab_size,
         embed_dim=cfg.embedding_dim,
@@ -112,7 +112,7 @@ def api_instruct():
     )
     return jsonify({"result": response})
 
-# ── 分类接口（预留，由队友对接）──
+# ── 分类接口──
 @app.route("/api/classify", methods=["POST"])
 def api_classify():
     data = request.get_json(force=True)
