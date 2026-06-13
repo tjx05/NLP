@@ -1,0 +1,36 @@
+{
+  "pretrain": {
+    "ppl": 27.9241,
+    "distinct": {
+      "distinct-1": 0.5864,
+      "distinct-2": 0.9227
+    }
+  },
+  "classifier": {
+    "accuracy": 0.9329,
+    "precision": 0.8876,
+    "recall": 1.0,
+    "f1": 0.9405,
+    "tp": 79,
+    "fp": 10,
+    "fn": 0,
+    "tn": 60
+  },
+  "instruct": {
+    "ppl": 17.3506,
+    "instruction_score": {
+      "write": 1.0,
+      "list": 0.9167,
+      "explain": 0.4545,
+      "overall": 0.93
+    },
+    "json_extraction": {
+      "json_validity": 0.98,
+      "field_coverage": 0.9,
+      "exact_match": 0.8264,
+      "contain_match": 0.8333,
+      "total_samples": 50,
+      "total_fields": 144
+    }
+  }
+}

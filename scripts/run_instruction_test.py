@@ -1,4 +1,4 @@
-# scripts/run_instruction_test.py
+# scripts/run_json_test.py
 import sys, os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -8,21 +8,38 @@ import tiktoken
 from config import cfg
 from src.models.gpt_model import GPTModel
 from src.utils.generation import generate_instruction_response
+from src.utils.generation import generate_json_response
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 # ========== 测试用例 ==========
 TEST_CASES = [
-    {"instruction": "Expand the following sentence into a paragraph",     "input": "The scientist made an important discovery."},
-    {"instruction": "Expand the following sentence into a paragraph",     "input": "She walked into the room and everything changed."},
-    {"instruction": "What is machine learning?",                          "input": ""},
-    {"instruction": "What is the difference between AI and human intelligence?", "input": ""},
-    {"instruction": "Write a short sentence about the mountains",         "input": ""},
-    {"instruction": "Write a short sentence about friendship",            "input": ""},
-    {"instruction": "Explain what photosynthesis is",                     "input": ""},
-    {"instruction": "Explain why the sky is blue",                        "input": ""},
-]
+  {
+    "instruction": "Find every mention belonging to the categories 'name', 'agency', 'area', 'year'. Output a JSON object where each field contains unique entity values; use 'N/A' for missing categories.",
+    "input": "Barbara Harff and Ted Gurr defined genocide as \"the promotion and execution of policies by a state or its agents which result in the deaths of a substantial portion of a group.\" Daniel D. Polsby and Don B. Kates, Jr. commented on these distinctions in later studies."
+  },
+  {
+    "instruction": "Locate all references to 'person', 'org', 'region', 'year' in the document. Provide unique normalized entities for each category; use 'N/A' where appropriate.",
+    "input": "Beyoncé attended St. Mary's Elementary School in Fredericksburg, Texas, and later performed with the school's choir. Dance instructor Darlette Johnson discovered her singing talent, and John Lennon was cited as an influence during her early training."
+  },
+  {
+    "instruction": "Extract the following entities from the text: 'people', 'org', 'place', 'timestamp'. Return each as a list of unique, normalized strings; if none exists, use 'N/A'.",
+    "input": "In 2013, the Infectious Disease Society of America (IDSA) reported that the weak antibiotic pipeline does not match bacteria's increasing ability to develop resistance. The number of new antibiotics approved per year in the United States remains low."
+  },
+  {
+    "instruction": "Analyze the text and extract: patient_name, symptoms, diagnosis. Return the result strictly in JSON format.",
+    "input": "Patient Michael Turner presented with fever, persistent cough, and shortness of breath. After examination, he was diagnosed with community-acquired pneumonia."
+  },
+  {
+    "instruction": "Convert the unstructured text into structured JSON containing: party_A, party_B, agreement_type, effective_date.",
+    "input": "This Software Licensing Agreement is entered into between CloudSphere Technologies and Apex Retail Group, effective January 1, 2026."
+  },
+  {
+    "instruction": "Read the document carefully and retrieve the following entities: candidate_name, university, graduation_year.",
+    "input": "Sarah Johnson graduated from Stanford University in 2022 with a Master's degree in Computer Science and currently works as a Machine Learning Engineer."
+  },
 
+]
 
 def load_model(checkpoint_name):
     model = GPTModel(
@@ -36,111 +53,48 @@ def load_model(checkpoint_name):
     ).to(cfg.device)
 
     checkpoint_path = os.path.join(BASE_DIR, "checkpoints", checkpoint_name)
-    checkpoint = torch.load(checkpoint_path, map_location=cfg.device, weights_only=True)
-    model.load_state_dict(checkpoint)
+    if not os.path.exists(checkpoint_path):
+        print(f"  ⚠️  找不到权重文件: {checkpoint_path}，跳过")
+        return None
+
+    model.load_state_dict(torch.load(checkpoint_path, map_location=cfg.device, weights_only=True))
     model.eval()
     print(f"Loaded: {checkpoint_path}\n")
     return model
 
 
 def run_test(model, tokenizer, label):
-    print("=" * 60)
+    print("=" * 65)
     print(f"  Checkpoint: {label}")
-    print("=" * 60)
+    print("=" * 65)
+
     for item in TEST_CASES:
-        response = generate_instruction_response(
+        response = generate_json_response(
             model, tokenizer,
             instruction=item["instruction"],
             input_text=item["input"],
-            max_new_tokens=60,
+            max_new_tokens=150,
             context_size=cfg.context_len,
-            temperature=0.6,  # 从0.3调高
-            top_k=50,  # 从20调大
-            repetition_penalty=1.3,  # 新增
+            temperature=0.0,
+            top_k=20,
+            repetition_penalty=1.0,
             device=cfg.device
         )
         print(f"[Instruction] {item['instruction']}")
-        if item["input"]:
-            print(f"[Input]       {item['input']}")
+        print(f"[Input]       {item['input']}")
         print(f"[Response]    {response}")
-        print("-" * 60)
+        print("-" * 65)
     print()
-
-
-
-def load_alpaca_cleaned_data(path="data/raw/alpaca_cleaned.json"):
-    """
-    Alpaca-Cleaned: 社区清洗版，约52000条，去除了噪声和重复样本
-    比原版Alpaca质量明显更高
-    """
-    import urllib.request, os, json
-    url = "https://raw.githubusercontent.com/gururise/AlpacaDataCleaned/main/alpaca_data_cleaned.json"
-    if not os.path.exists(path):
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        print("Downloading Alpaca-Cleaned...")
-        urllib.request.urlretrieve(url, path)
-        print(f"Downloaded to {path}")
-    with open(path, "r") as f:
-        return json.load(f)
-
-
-def load_dolly_data(path="data/raw/dolly_data.json"):
-    """
-    Databricks Dolly-15k: 15000条人工标注，指令类型多样
-    包含问答、摘要、创意写作、信息提取等8种任务类型
-    格式需转换成统一的 instruction/input/output 格式
-    """
-    import os, json
-    os.environ["HF_ENDPOINT"] = "https://hf-mirror.com"
-
-    if not os.path.exists(path):
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        print("Downloading Dolly-15k...")
-        from datasets import load_dataset
-        ds = load_dataset("databricks/databricks-dolly-15k", split="train")
-        converted = []
-        for item in ds:
-            converted.append({
-                "instruction": item["instruction"],
-                "input":       item["context"],   # dolly叫context
-                "output":      item["response"]
-            })
-        with open(path, "w", encoding="utf-8") as f:
-            json.dump(converted, f, ensure_ascii=False, indent=2)
-        print(f"Saved to {path}")
-
-    with open(path, "r", encoding="utf-8") as f:
-        return json.load(f)
-
-
-def load_combined_data(alpaca_limit=5000, dolly_limit=5000):
-    """
-    混合数据集：Alpaca-Cleaned + Dolly-15k
-    两个数据集互补，覆盖更多指令类型
-    """
-    import random
-    alpaca = load_alpaca_cleaned_data()[:alpaca_limit]
-    dolly  = load_dolly_data()[:dolly_limit]
-    combined = alpaca + dolly
-    random.shuffle(combined)
-    print(f"Combined dataset: {len(alpaca)} alpaca + {len(dolly)} dolly = {len(combined)} total")
-    return combined
 
 
 def main():
     tokenizer = tiktoken.get_encoding("gpt2")
 
-    # 对比两个 checkpoint
-
-    for ckpt_name in ["instruct_epoch1.pt", "instruct_epoch2.pt","instruct_epoch3.pt"]:
+    # 依次测试三个 epoch 的权重，找出最好的
+    for ckpt_name in ["begin_json_epoch5.pt"]:
         model = load_model(ckpt_name)
-        run_test(model, tokenizer, label=ckpt_name)
-
-    """
-    # 最小数据集的第二轮c
-    model = load_model("instruct_epoch2_simple.pt")
-    run_test(model, tokenizer, label="instruct_epoch2_simple.pt")
-    """
+        if model is not None:
+            run_test(model, tokenizer, label=ckpt_name)
 
 
 if __name__ == "__main__":
