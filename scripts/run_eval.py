@@ -190,7 +190,7 @@ def eval_instruct():
     print(f"  指令完成率（overall）: {instr_scores['overall']:.2%}")
     print(f"  各类别细分: {instr_scores}")
 
-    # ==================== 🎯 数据源二：专项结构化 JSON 提取数据集 ====================
+    # ==================== 数据源二：专项结构化 JSON 提取数据集 ====================
     # 用于测量：全新的 Field F1 和 Value F1
     with open("D:/NLP/NLP/data/instruct_test.json") as f:
         json_test = json.load(f)[-50:]

@@ -21,11 +21,11 @@ from src.data.instruction_dataset import InstructionDataset, collate_fn
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
-# 🎯 1. 权重加载路径：指向你上一次微调出来的模型权重文件
+#  1. 权重加载路径：指向你上一次微调出来的模型权重文件
 checkpoint_path = os.path.join(BASE_DIR, "checkpoints", "instruct_epoch1.pt")
 OUTPUT_DIR = os.path.join(BASE_DIR, "output")
 
-# 🎯 2. 数据集路径定义
+#  2. 数据集路径定义
 PATH_NEW_JSON = r"D:\NLP\NLP\data\instrc_raw\instrc_rawfinal_sft_train_dataset.json"  # 新洗好的JSON提取数据
 PATH_OLD_SFT = r"D:\NLP\NLP\data\raw\old_instruct.json"  # 刚刚裁剪出的几百条老数据
 
@@ -75,7 +75,7 @@ def train():
     # 1. 加载 tokenizer
     tokenizer = tiktoken.get_encoding("gpt2")
 
-    # 2. 🎯 改造数据加载逻辑：加载新数据 + 缝合老数据
+    # 2.  改造数据加载逻辑：加载新数据 + 缝合老数据
     print("正在加载新洗好的 JSON 提取数据...")
     with open(PATH_NEW_JSON, "r", encoding="utf-8") as f:
         new_json_data = json.load(f)
@@ -86,7 +86,7 @@ def train():
 
     # 完美缝合
     data = new_json_data + old_sft_data
-    print(f"📊 数据缝合完毕！新数据: {len(new_json_data)} 条 | 老数据: {len(old_sft_data)} 条 | 总计: {len(data)} 条")
+    print(f" 数据缝合完毕！新数据: {len(new_json_data)} 条 | 老数据: {len(old_sft_data)} 条 | 总计: {len(data)} 条")
 
     # 依然保留你们原代码里的过滤机制（可以防止空数据导致空指针）
     data = [d for d in data if len(d.get("output", "")) > 10]
@@ -120,7 +120,7 @@ def train():
     model.load_state_dict(checkpoint)
     print(f"✅ 上一轮微调权重已成功加载自: {checkpoint_path}")
 
-    # 5. 🎯 优化器参数微调：降低学习率（从 5e-5 降到 1e-5）
+    # 5.  优化器参数微调：降低学习率（从 5e-5 降到 1e-5）
     optimizer = torch.optim.AdamW(model.parameters(), lr=1e-5, weight_decay=0.01)
     scheduler = warmup_scheduler(optimizer, warmup_steps=100)  # 数据量变小了，warmup步数也可以相应减少
 

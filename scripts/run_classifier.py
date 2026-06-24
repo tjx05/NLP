@@ -1,11 +1,11 @@
 import os
 import sys
-import time # 【新增】
+import time 
 import torch
 import torch.nn.functional as F
 import matplotlib.pyplot as plt 
 import numpy as np
-from sklearn.metrics import classification_report, confusion_matrix # 【新增】
+from sklearn.metrics import classification_report, confusion_matrix 
 
 # 将项目根目录加入系统路径，确保能顺利导入 src 和 config
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -38,7 +38,7 @@ def evaluate_accuracy(model, data_loader, device):
             total += targets.size(0)
     return correct / total
 
-# 【新增】深度评估函数
+# 深度评估函数
 def evaluate_comprehensive(model, data_loader, device):
     model.eval()
     all_preds = []
@@ -60,7 +60,7 @@ def evaluate_comprehensive(model, data_loader, device):
 
 def train():
     device = torch.device(cfg.device)
-    print(f"🔥 当前运行设备: {device}")
+    print(f" 当前运行设备: {device}")
     
     # 1. 准备数据
     train_csv = "data/cls_raw/train.csv"
@@ -91,7 +91,7 @@ def train():
 
     # 4. 训练循环
     epochs = cfg.epochs
-    print("🚀 分类微调正式启动...")
+    print(" 分类微调正式启动...")
     for epoch in range(epochs):
         epoch_start_time = time.time() # 【新增】记录本轮开始时间
         model.train()
@@ -121,8 +121,8 @@ def train():
         train_accuracies.append(train_acc * 100)
         val_accuracies.append(val_acc * 100)
         
-        epoch_end_time = time.time() # 【新增】记录本轮结束时间
-        # 【修改】打印信息加入了单轮耗时
+        epoch_end_time = time.time() # 记录本轮结束时间
+        # 打印信息加入了单轮耗时
         print(f"✨ Epoch {epoch+1} 评估 -> 训练集准确率: {train_acc*100:.2f}% | 验证集准确率: {val_acc*100:.2f}% | 耗时: {epoch_end_time - epoch_start_time:.2f} 秒")
         
     # 5. 保存模型权重
@@ -131,9 +131,9 @@ def train():
     torch.save(model.state_dict(), save_path)
     print(f"🎉 模型权重已安全保存至: {save_path}")
 
-    # ================= 【新增】深度评估报告输出 =================
+    # ================= 深度评估报告输出 =================
     print("\n" + "="*50)
-    print("🏆 原局部微调：最终验证集深度评估报告 (Validation Report)")
+    print(" 原局部微调：最终验证集深度评估报告 (Validation Report)")
     print("="*50)
     final_report, final_cm = evaluate_comprehensive(model, val_loader, device)
     print(final_report)
@@ -144,7 +144,7 @@ def train():
     print("="*50 + "\n")
 
     # ================= 绘图与保存逻辑 =================
-    print("📊 正在生成训练指标可视化图表...")
+    print(" 正在生成训练指标可视化图表...")
     os.makedirs("output", exist_ok=True) 
     
     plt.figure(figsize=(12, 5))
@@ -182,7 +182,7 @@ def train():
     plot_save_path = "output/cls_training.png"
     plt.savefig(plot_save_path, dpi=300)
     plt.close() 
-    print(f"🖼️ 可视化图表已成功保存至: {plot_save_path}")
+    print(f" 可视化图表已成功保存至: {plot_save_path}")
 
 if __name__ == "__main__":
     train()

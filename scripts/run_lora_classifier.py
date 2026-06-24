@@ -1,11 +1,11 @@
 import os
 import sys
-import time # 【新增】用于记录每轮训练耗时
+import time # 用于记录每轮训练耗时
 import torch
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.metrics import classification_report, confusion_matrix # 【新增】用于深度评估
+from sklearn.metrics import classification_report, confusion_matrix # 用于深度评估
 
 # 动态将项目根目录加入系统路径，确保能找到 src 和 config
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -39,7 +39,7 @@ def evaluate_accuracy(model, data_loader, device):
             total += targets.size(0)
     return correct / total
 
-# 【新增】深度评估函数：输出 F1, Precision, Recall 和 混淆矩阵
+# 深度评估函数：输出 F1, Precision, Recall 和 混淆矩阵
 def evaluate_comprehensive(model, data_loader, device):
     model.eval()
     all_preds = []
@@ -139,11 +139,11 @@ def train():
     save_dir = "checkpoints/lora_finetuned_spam"
     os.makedirs(save_dir, exist_ok=True)
     model.save_pretrained(save_dir) 
-    print(f"🎉 LoRA 轻量级权重已安全保存至: {save_dir}")
+    print(f" LoRA 轻量级权重已安全保存至: {save_dir}")
 
-    # ================= 【新增】深度评估报告输出 =================
+    # ================= 深度评估报告输出 =================
     print("\n" + "="*50)
-    print("🏆 LoRA 微调：最终验证集深度评估报告 (Validation Report)")
+    print(" LoRA 微调：最终验证集深度评估报告 (Validation Report)")
     print("="*50)
     final_report, final_cm = evaluate_comprehensive(model, val_loader, device)
     print(final_report)
@@ -154,7 +154,7 @@ def train():
     print("="*50 + "\n")
 
     # ================= 图表可视化部分 =================
-    print("📊 正在生成 LoRA 训练指标可视化图表...")
+    print(" 正在生成 LoRA 训练指标可视化图表...")
     os.makedirs("output", exist_ok=True)
     
     plt.figure(figsize=(12, 5))
