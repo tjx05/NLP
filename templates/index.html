@@ -54,16 +54,14 @@
       display: flex;
       height: 100vh;
       overflow: hidden;
+      font-size: 14px;
     }
 
-    /* ── sidebar ── */
     .sidebar {
-      width: 220px;
-      min-width: 220px;
+      width: 210px; min-width: 210px;
       background: var(--bg-secondary);
       border-right: 0.5px solid var(--border);
-      display: flex;
-      flex-direction: column;
+      display: flex; flex-direction: column;
       padding: 16px 12px;
     }
     .logo { font-size: 15px; font-weight: 500; padding: 8px 12px; margin-bottom: 20px; }
@@ -72,117 +70,160 @@
     .nav-item {
       display: flex; align-items: center; gap: 10px;
       padding: 9px 12px; border-radius: var(--radius-md);
-      cursor: pointer; font-size: 13.5px; color: var(--text-secondary);
+      cursor: pointer; font-size: 13px; color: var(--text-secondary);
       transition: background .15s, color .15s;
       margin-bottom: 2px; border: none; background: transparent;
       width: 100%; text-align: left; font-family: var(--font);
     }
-    .nav-item i { font-size: 16px; flex-shrink: 0; }
+    .nav-item i { font-size: 15px; flex-shrink: 0; }
     .nav-item:hover { background: var(--bg-primary); color: var(--text-primary); }
     .nav-item.active { background: var(--bg-primary); color: var(--text-primary); font-weight: 500; }
-    .nav-item .badge {
+    .badge {
       margin-left: auto; font-size: 10px;
       background: var(--bg-info); color: var(--text-info);
       padding: 2px 7px; border-radius: 99px;
     }
     .sidebar-footer {
-      margin-top: auto;
-      padding-top: 12px;
+      margin-top: auto; padding-top: 12px;
       border-top: 0.5px solid var(--border);
-      font-size: 11px; color: var(--text-tertiary);
-      line-height: 1.6;
+      font-size: 11px; color: var(--text-tertiary); line-height: 1.6;
     }
+    .clear-btn {
+      width: 100%; margin-top: 8px; padding: 6px;
+      border-radius: var(--radius-md); border: 0.5px solid var(--border);
+      background: transparent; font-size: 11px; color: var(--text-tertiary);
+      cursor: pointer; font-family: var(--font); transition: background .12s, color .12s;
+      display: flex; align-items: center; justify-content: center; gap: 5px;
+    }
+    .clear-btn:hover { background: var(--bg-primary); color: var(--text-primary); }
 
-    /* ── main ── */
-    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .main { flex: 1; display: flex; overflow: hidden; }
+    .chat-col { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
-    .topbar {
-      padding: 14px 24px;
+    .param-col {
+      width: 224px; min-width: 224px;
+      background: var(--bg-secondary);
+      border-left: 0.5px solid var(--border);
+      display: flex; flex-direction: column;
+      overflow-y: auto;
+    }
+    .param-header {
+      padding: 14px 16px 10px;
+      font-size: 11px; font-weight: 500;
+      color: var(--text-tertiary); letter-spacing: .05em;
       border-bottom: 0.5px solid var(--border);
-      display: flex; align-items: center; gap: 12px;
-      background: var(--bg-primary);
       flex-shrink: 0;
     }
-    .topbar-title { font-size: 15px; font-weight: 500; }
-    .topbar-sub { font-size: 12px; color: var(--text-tertiary); margin-left: auto; }
+    .param-section { padding: 14px 16px; border-bottom: 0.5px solid var(--border); }
+    .param-section-title {
+      font-size: 11px; font-weight: 500; color: var(--text-secondary);
+      margin-bottom: 12px; display: flex; align-items: center; gap: 6px;
+    }
+    .param-row { margin-bottom: 14px; }
+    .param-row:last-child { margin-bottom: 0; }
+    .param-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+    .param-name { font-size: 12px; color: var(--text-secondary); }
+    .param-val { font-size: 12px; font-weight: 500; color: var(--text-primary); min-width: 32px; text-align: right; }
+    .param-desc { font-size: 11px; color: var(--text-tertiary); margin-top: 4px; line-height: 1.4; }
+    input[type=range] { width: 100%; accent-color: var(--text-primary); }
+    .preset-row { display: flex; gap: 6px; flex-wrap: wrap; }
+    .preset-btn {
+      padding: 4px 10px; border-radius: 99px;
+      border: 0.5px solid var(--border); background: transparent;
+      font-size: 11px; color: var(--text-secondary); cursor: pointer;
+      font-family: var(--font); transition: background .12s, color .12s;
+    }
+    .preset-btn:hover, .preset-btn.active {
+      background: var(--bg-primary); color: var(--text-primary);
+      border-color: var(--border-hover);
+    }
+    .reset-btn {
+      width: 100%; padding: 7px; border-radius: var(--radius-md);
+      border: 0.5px solid var(--border); background: transparent;
+      font-size: 12px; color: var(--text-secondary); cursor: pointer;
+      font-family: var(--font); transition: background .12s;
+    }
+    .reset-btn:hover { background: var(--bg-primary); color: var(--text-primary); }
 
-    /* ── panels ── */
+    .topbar {
+      padding: 12px 20px; border-bottom: 0.5px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+      background: var(--bg-primary); flex-shrink: 0;
+    }
+    .topbar-title { font-size: 14px; font-weight: 500; }
+    .topbar-sub { font-size: 11px; color: var(--text-tertiary); margin-left: auto; }
+
     .panel { display: none; flex-direction: column; flex: 1; overflow: hidden; }
     .panel.active { display: flex; }
 
     .chat-area {
-      flex: 1; overflow-y: auto; padding: 28px 40px;
-      display: flex; flex-direction: column; gap: 20px;
+      flex: 1; overflow-y: auto; padding: 24px 28px;
+      display: flex; flex-direction: column; gap: 18px;
     }
-
-    /* ── welcome ── */
-    .welcome { text-align: center; padding: 48px 24px 32px; color: var(--text-secondary); }
-    .welcome h2 { font-size: 20px; font-weight: 500; color: var(--text-primary); margin-bottom: 8px; }
-    .welcome p { font-size: 14px; line-height: 1.6; max-width: 420px; margin: 0 auto 24px; }
-    .examples { display: flex; flex-direction: column; gap: 8px; max-width: 420px; margin: 0 auto; }
+    .welcome { text-align: center; padding: 40px 20px 28px; color: var(--text-secondary); }
+    .welcome h2 { font-size: 18px; font-weight: 500; color: var(--text-primary); margin-bottom: 6px; }
+    .welcome p { font-size: 13px; line-height: 1.6; max-width: 380px; margin: 0 auto 20px; }
+    .examples { display: flex; flex-direction: column; gap: 6px; max-width: 380px; margin: 0 auto; }
     .example-btn {
-      padding: 10px 16px; border-radius: var(--radius-md);
+      padding: 9px 14px; border-radius: var(--radius-md);
       border: 0.5px solid var(--border); background: var(--bg-primary);
-      color: var(--text-secondary); font-size: 13px; cursor: pointer;
-      text-align: left; transition: background .15s, color .15s;
-      font-family: var(--font);
+      color: var(--text-secondary); font-size: 12px; cursor: pointer;
+      text-align: left; transition: background .15s; font-family: var(--font);
     }
-    .example-btn:hover { background: var(--bg-secondary); color: var(--text-primary); }
-
+    .example-btn:hover { background: var(--bg-tertiary); color: var(--text-primary); }
     .tag {
       display: inline-flex; align-items: center; gap: 4px;
       font-size: 11px; padding: 3px 8px; border-radius: 99px; margin-bottom: 8px;
     }
     .tag.pretrain { background: var(--bg-success); color: var(--text-success); }
-    .tag.classify { background: var(--bg-warning); color: var(--text-warning); }
-    .tag.instruct { background: var(--bg-info); color: var(--text-info); }
+    .tag.classify  { background: var(--bg-warning); color: var(--text-warning); }
+    .tag.instruct  { background: var(--bg-info);    color: var(--text-info); }
 
-    /* ── messages ── */
-    .msg { display: flex; gap: 12px; max-width: 680px; }
+    .msg { display: flex; gap: 10px; max-width: 560px; }
     .msg.user { flex-direction: row-reverse; margin-left: auto; }
     .avatar {
-      width: 32px; height: 32px; border-radius: 50%;
+      width: 28px; height: 28px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 12px; font-weight: 500; flex-shrink: 0;
+      font-size: 11px; font-weight: 500; flex-shrink: 0;
     }
-    .avatar.bot { background: var(--bg-info); color: var(--text-info); }
+    .avatar.bot  { background: var(--bg-info); color: var(--text-info); }
     .avatar.user { background: var(--bg-secondary); color: var(--text-secondary); border: 0.5px solid var(--border); }
     .bubble {
-      padding: 11px 16px; border-radius: var(--radius-lg);
-      font-size: 14px; line-height: 1.65; max-width: 540px; white-space: pre-wrap;
+      padding: 10px 14px; border-radius: var(--radius-lg);
+      font-size: 13px; line-height: 1.65; max-width: 460px; white-space: pre-wrap;
     }
-    .bubble.bot { background: var(--bg-primary); border: 0.5px solid var(--border); }
-    .bubble.user { background: var(--bg-secondary); color: var(--text-primary); }
+    .bubble.bot  { background: var(--bg-primary); border: 0.5px solid var(--border); }
+    .bubble.user { background: var(--bg-secondary); }
     .bubble.loading { color: var(--text-tertiary); font-style: italic; }
 
-    /* ── input ── */
+    .time-stamp {
+      font-size: 10px; color: var(--text-tertiary);
+      text-align: center; margin: -8px 0 -4px;
+    }
+
     .input-area {
-      padding: 16px 40px 20px;
-      border-top: 0.5px solid var(--border);
-      background: var(--bg-primary);
-      flex-shrink: 0;
+      padding: 14px 28px 18px; border-top: 0.5px solid var(--border);
+      background: var(--bg-primary); flex-shrink: 0;
     }
     .input-row {
-      display: flex; gap: 10px; align-items: flex-end;
-      background: var(--bg-secondary);
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius-lg); padding: 10px 14px;
+      display: flex; gap: 8px; align-items: flex-end;
+      background: var(--bg-secondary); border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg); padding: 9px 12px;
     }
     .input-row textarea {
       flex: 1; border: none; background: transparent;
-      font-family: var(--font); font-size: 14px; color: var(--text-primary);
-      resize: none; outline: none; max-height: 120px; min-height: 24px; line-height: 1.5;
+      font-family: var(--font); font-size: 13px; color: var(--text-primary);
+      resize: none; outline: none; max-height: 100px; min-height: 22px; line-height: 1.5;
     }
     .input-row textarea::placeholder { color: var(--text-tertiary); }
     .send-btn {
-      width: 32px; height: 32px; border-radius: var(--radius-md);
+      width: 28px; height: 28px; border-radius: var(--radius-md);
       border: none; background: var(--text-primary); color: var(--bg-primary);
       cursor: pointer; display: flex; align-items: center; justify-content: center;
       flex-shrink: 0; transition: opacity .15s;
     }
     .send-btn:disabled { opacity: .35; cursor: not-allowed; }
-    .send-btn i { font-size: 15px; }
-    .hint { font-size: 11px; color: var(--text-tertiary); text-align: center; margin-top: 8px; }
+    .hint { font-size: 11px; color: var(--text-tertiary); text-align: center; margin-top: 6px; }
   </style>
 </head>
 <body>
@@ -190,122 +231,298 @@
 <nav class="sidebar">
   <div class="logo">NLP-LLM <span>从零构建大语言模型</span></div>
   <div class="nav-label">功能模块</div>
-  <button class="nav-item active" onclick="switchPanel('pretrain', this)" id="nav-pretrain">
+  <button class="nav-item active" onclick="switchPanel('pretrain',this)" id="nav-pretrain">
     <i class="ti ti-pencil" aria-hidden="true"></i> 预训练续写
   </button>
-  <button class="nav-item" onclick="switchPanel('classify', this)" id="nav-classify">
-    <i class="ti ti-tag" aria-hidden="true"></i> 文本分类
-    <span class="badge">2</span>
+  <button class="nav-item" onclick="switchPanel('classify',this)" id="nav-classify">
+    <i class="ti ti-tag" aria-hidden="true"></i> 文本分类 <span class="badge">2</span>
   </button>
-  <button class="nav-item" onclick="switchPanel('instruct', this)" id="nav-instruct">
+  <button class="nav-item" onclick="switchPanel('instruct',this)" id="nav-instruct">
     <i class="ti ti-message-chatbot" aria-hidden="true"></i> 指令微调
   </button>
   <div class="sidebar-footer">
-    基于 GPT 架构 · 8层 Transformer<br>
-    词表 50257 · 嵌入维度 768
+    GPT · 8层 Transformer<br>词表 50257 · 嵌入维度 768
+    <button class="clear-btn" onclick="clearHistory()">
+      <i class="ti ti-trash" style="font-size:12px" aria-hidden="true"></i> 清空当前记录
+    </button>
   </div>
 </nav>
 
 <div class="main">
+  <div class="chat-col">
 
-  <!-- 预训练续写 -->
-  <div class="panel active" id="panel-pretrain">
-    <div class="topbar">
-      <i class="ti ti-pencil" style="font-size:16px;color:var(--text-secondary)" aria-hidden="true"></i>
-      <span class="topbar-title">预训练续写</span>
-      <span class="topbar-sub">英文文本续写 · 贪心 / Top-k 采样</span>
-    </div>
-    <div class="chat-area" id="chat-pretrain">
-      <div class="welcome" id="welcome-pretrain">
-        <div class="tag pretrain"><i class="ti ti-circle-filled" style="font-size:8px" aria-hidden="true"></i> 预训练模式</div>
-        <h2>文本续写</h2>
-        <p>输入英文开头，模型将基于预训练权重自动续写后续内容，展示基础语言建模能力。</p>
-        <div class="examples">
-          <button class="example-btn" onclick="fillInput('pretrain','Hello, I am')">Hello, I am</button>
-          <button class="example-btn" onclick="fillInput('pretrain','The future of artificial intelligence')">The future of artificial intelligence</button>
-          <button class="example-btn" onclick="fillInput('pretrain','Once upon a time in a small village')">Once upon a time in a small village</button>
+    <!-- 预训练续写 -->
+    <div class="panel active" id="panel-pretrain">
+      <div class="topbar">
+        <i class="ti ti-pencil" style="font-size:15px;color:var(--text-secondary)" aria-hidden="true"></i>
+        <span class="topbar-title">预训练续写</span>
+        <span class="topbar-sub">英文文本续写 · 贪心 / Top-k 采样</span>
+      </div>
+      <div class="chat-area" id="chat-pretrain">
+        <div class="welcome" id="welcome-pretrain">
+          <div class="tag pretrain"><i class="ti ti-circle-filled" style="font-size:8px" aria-hidden="true"></i> 预训练模式</div>
+          <h2>文本续写</h2>
+          <p>输入英文开头，模型将基于预训练权重自动续写后续内容。</p>
+          <div class="examples">
+            <button class="example-btn" onclick="fillInput('pretrain','Hello, I am')">Hello, I am</button>
+            <button class="example-btn" onclick="fillInput('pretrain','The future of artificial intelligence')">The future of artificial intelligence</button>
+            <button class="example-btn" onclick="fillInput('pretrain','Once upon a time in a small village')">Once upon a time in a small village</button>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="input-area">
-      <div class="input-row">
-        <textarea id="input-pretrain" placeholder="输入英文开头，模型将续写…" rows="1"
-          onkeydown="handleKey(event,'pretrain')" oninput="autoResize(this)"></textarea>
-        <button class="send-btn" onclick="send('pretrain')" id="btn-pretrain" aria-label="发送">
-          <i class="ti ti-arrow-up" aria-hidden="true"></i>
-        </button>
+      <div class="input-area">
+        <div class="input-row">
+          <textarea id="input-pretrain" placeholder="输入英文开头，模型将续写…" rows="1"
+            onkeydown="handleKey(event,'pretrain')" oninput="autoResize(this)"></textarea>
+          <button class="send-btn" onclick="send('pretrain')" id="btn-pretrain" aria-label="发送">
+            <i class="ti ti-arrow-up" style="font-size:14px" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="hint">Enter 发送 · Shift+Enter 换行</div>
       </div>
-      <div class="hint">Enter 发送 · Shift+Enter 换行</div>
     </div>
-  </div>
 
-  <!-- 文本分类 -->
-  <div class="panel" id="panel-classify">
-    <div class="topbar">
-      <i class="ti ti-tag" style="font-size:16px;color:var(--text-secondary)" aria-hidden="true"></i>
-      <span class="topbar-title">文本分类</span>
-      <span class="topbar-sub">安全合规检测 · 垃圾信息识别</span>
-    </div>
-    <div class="chat-area" id="chat-classify">
-      <div class="welcome" id="welcome-classify">
-        <div class="tag classify"><i class="ti ti-circle-filled" style="font-size:8px" aria-hidden="true"></i> 分类微调模式</div>
-        <h2>文本合规检测</h2>
-        <p>输入任意英文文本，底层张量网络将实时计算并判别其属于正常交互信息，还是诱导欺诈信息。</p>
-        <div class="examples">
-          <button class="example-btn" onclick="fillInput('classify','CONGRATULATIONS! You are a winner! Reply WIN to claim $1000 cash.')">CONGRATULATIONS! You are a winner! Reply WIN to claim $1000 cash.</button>
-          <button class="example-btn" onclick="fillInput('classify','Hey, just wanted to check if we\'re still on for dinner tonight?')">Hey, just wanted to check if we're still on for dinner tonight?</button>
-          <button class="example-btn" onclick="fillInput('classify','Your account has been selected for a special reward. Click the link.')">Your account has been selected for a special reward. Click the link.</button>
+    <!-- 文本分类 -->
+    <div class="panel" id="panel-classify">
+      <div class="topbar">
+        <i class="ti ti-tag" style="font-size:15px;color:var(--text-secondary)" aria-hidden="true"></i>
+        <span class="topbar-title">文本分类</span>
+        <span class="topbar-sub">垃圾邮件识别 · 情感分析</span>
+      </div>
+      <div class="chat-area" id="chat-classify">
+        <div class="welcome" id="welcome-classify">
+          <div class="tag classify"><i class="ti ti-circle-filled" style="font-size:8px" aria-hidden="true"></i> 分类微调模式</div>
+          <h2>文本分类</h2>
+          <p>输入英文文本，模型判断是否为垃圾邮件及情感极性。</p>
+          <div class="examples">
+            <button class="example-btn" onclick="fillInput('classify','You have won a free prize! Click here to claim it.')">You have won a free prize! Click here to claim it.</button>
+            <button class="example-btn" onclick="fillInput('classify','I love this movie, it\'s so touching.')">I love this movie, it's so touching.</button>
+            <button class="example-btn" onclick="fillInput('classify','Your account has been selected for a special reward.')">Your account has been selected for a special reward.</button>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="input-area">
-      <div class="input-row">
-        <textarea id="input-classify" placeholder="输入英文文本，进行合规安全检测…" rows="1"
-          onkeydown="handleKey(event,'classify')" oninput="autoResize(this)"></textarea>
-        <button class="send-btn" onclick="send('classify')" id="btn-classify" aria-label="发送">
-          <i class="ti ti-arrow-up" aria-hidden="true"></i>
-        </button>
+      <div class="input-area">
+        <div class="input-row">
+          <textarea id="input-classify" placeholder="输入英文文本，进行分类判断…" rows="1"
+            onkeydown="handleKey(event,'classify')" oninput="autoResize(this)"></textarea>
+          <button class="send-btn" onclick="send('classify')" id="btn-classify" aria-label="发送">
+            <i class="ti ti-arrow-up" style="font-size:14px" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="hint">Enter 发送 · Shift+Enter 换行</div>
       </div>
-      <div class="hint">Enter 发送 · Shift+Enter 换行</div>
     </div>
-  </div>
 
-  <!-- 指令微调 -->
-  <div class="panel" id="panel-instruct">
-    <div class="topbar">
-      <i class="ti ti-message-chatbot" style="font-size:16px;color:var(--text-secondary)" aria-hidden="true"></i>
-      <span class="topbar-title">指令微调</span>
-      <span class="topbar-sub">英文指令遵循助手 · Alpaca 格式</span>
-    </div>
-    <div class="chat-area" id="chat-instruct">
-      <div class="welcome" id="welcome-instruct">
-        <div class="tag instruct"><i class="ti ti-circle-filled" style="font-size:8px" aria-hidden="true"></i> 指令微调模式</div>
-        <h2>指令遵循助手</h2>
-        <p>输入英文指令，模型将尝试理解并执行，展示指令微调后的任务遵循能力。</p>
-        <div class="examples">
-          <button class="example-btn" onclick="fillInput('instruct','Explain what a transformer is')">Explain what a transformer is</button>
-          <button class="example-btn" onclick="fillInput('instruct','Write a short sentence about the ocean')">Write a short sentence about the ocean</button>
+    <!-- 指令微调 -->
+    <div class="panel" id="panel-instruct">
+      <div class="topbar">
+        <i class="ti ti-message-chatbot" style="font-size:15px;color:var(--text-secondary)" aria-hidden="true"></i>
+        <span class="topbar-title">指令微调</span>
+        <span class="topbar-sub">英文指令遵循助手 · Alpaca 格式</span>
+      </div>
+      <div class="chat-area" id="chat-instruct">
+        <div class="welcome" id="welcome-instruct">
+          <div class="tag instruct"><i class="ti ti-circle-filled" style="font-size:8px" aria-hidden="true"></i> 指令微调模式</div>
+          <h2>指令遵循助手</h2>
+          <p>输入英文指令，模型尝试理解并执行，展示指令微调后的任务遵循能力。</p>
+          <div class="examples">
+            <button class="example-btn" onclick="fillInput('instruct','Explain what a transformer is')">Explain what a transformer is</button>
+            <button class="example-btn" onclick="fillInput('instruct','Write a short sentence about the ocean')">Write a short sentence about the ocean</button>
+            <button class="example-btn" onclick="fillInputWithData('instruct',
+              `Locate all references to \'person\', \'org\', \'region\', \'year\' in the document. Provide unique normalized entities for each category; use \'N/A\' where appropriate.`,
+              `Beyoncé attended St. Mary\'s Elementary School in Fredericksburg, Texas, and later performed with the school\'s choir. Dance instructor Darlette Johnson discovered her singing talent, and John Lennon was cited as an influence during her early training.`
+            )">🔍 实体提取：人物/机构/地区/年份</button>
+            <button class="example-btn" onclick="fillInputWithData('instruct',
+              `Analyze the text and extract: patient_name, symptoms, diagnosis. Return the result strictly in JSON format.`,
+              `Patient Michael Turner presented with fever, persistent cough, and shortness of breath. After examination, he was diagnosed with community-acquired pneumonia.`
+            )">🏥 医疗信息提取</button>
+            <button class="example-btn" onclick="fillInputWithData('instruct',
+              `Read the document carefully and retrieve the following entities: candidate_name, university, graduation_year.`,
+              `Sarah Johnson graduated from Stanford University in 2022 with a Master\'s degree in Computer Science and currently works as a Machine Learning Engineer.`
+            )">🎓 候选人信息提取</button>
+            <button class="example-btn" onclick="fillInputWithData('instruct',
+              `Extract company_name, revenue, net_income, and fiscal_year from the financial report. Output a JSON object where each field contains unique entity values; use \'N/A\' for missing categories.`,
+              `Nova Energy reported a total revenue of $8.4 billion for fiscal year 2025, representing a 12% increase compared to the previous year. Net income reached $1.2 billion, reflecting strong operational performance despite market volatility.`
+            )">💰 财务报告提取</button>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="input-area">
-      <div class="input-row">
-        <textarea id="input-instruct" placeholder="输入英文指令…" rows="1"
-          onkeydown="handleKey(event,'instruct')" oninput="autoResize(this)"></textarea>
-        <button class="send-btn" onclick="send('instruct')" id="btn-instruct" aria-label="发送">
-          <i class="ti ti-arrow-up" aria-hidden="true"></i>
-        </button>
+      <div class="input-area">
+        <div class="input-row">
+          <textarea id="input-instruct" placeholder="输入英文指令…" rows="1"
+            onkeydown="handleKey(event,'instruct')" oninput="autoResize(this)"></textarea>
+          <button class="send-btn" onclick="send('instruct')" id="btn-instruct" aria-label="发送">
+            <i class="ti ti-arrow-up" style="font-size:14px" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="hint">Enter 发送 · Shift+Enter 换行</div>
       </div>
-      <div class="hint">Enter 发送 · Shift+Enter 换行</div>
     </div>
+
   </div>
 
+  <!-- 右侧参数面板 -->
+  <aside class="param-col">
+    <div class="param-header">参数调节</div>
+
+    <div class="param-section">
+      <div class="param-section-title">
+        <i class="ti ti-adjustments-horizontal" style="font-size:13px" aria-hidden="true"></i> 快速预设
+      </div>
+      <div class="preset-row">
+        <button class="preset-btn" onclick="applyPreset('conservative',this)">保守</button>
+        <button class="preset-btn active" onclick="applyPreset('balanced',this)">平衡</button>
+        <button class="preset-btn" onclick="applyPreset('creative',this)">创意</button>
+      </div>
+    </div>
+
+    <div class="param-section">
+      <div class="param-section-title">
+        <i class="ti ti-maximize" style="font-size:13px" aria-hidden="true"></i> 生成长度
+      </div>
+      <div class="param-row">
+        <div class="param-label">
+          <span class="param-name">最大 Token 数</span>
+          <span class="param-val" id="val-tokens">50</span>
+        </div>
+        <input type="range" min="20" max="200" step="10" value="50" id="slider-tokens"
+          oninput="updateVal('tokens', this.value)">
+        <div class="param-desc">控制回答最大长度，越大越详细但越慢</div>
+      </div>
+    </div>
+
+    <div class="param-section">
+      <div class="param-section-title">
+        <i class="ti ti-flame" style="font-size:13px" aria-hidden="true"></i> 随机性
+      </div>
+      <div class="param-row">
+        <div class="param-label">
+          <span class="param-name">Temperature</span>
+          <span class="param-val" id="val-temp">0.6</span>
+        </div>
+        <input type="range" min="0" max="2" step="0.1" value="0.6" id="slider-temp"
+          oninput="updateVal('temp', this.value, 1)">
+        <div class="param-desc">越高越随机有创意，越低越确定保守</div>
+      </div>
+      <div class="param-row">
+        <div class="param-label">
+          <span class="param-name">Top-k</span>
+          <span class="param-val" id="val-topk">40</span>
+        </div>
+        <input type="range" min="1" max="100" step="1" value="40" id="slider-topk"
+          oninput="updateVal('topk', this.value)">
+        <div class="param-desc">每步从概率最高的 k 个词里采样</div>
+      </div>
+    </div>
+
+    <div class="param-section">
+      <div class="param-section-title">
+        <i class="ti ti-repeat-off" style="font-size:13px" aria-hidden="true"></i> 重复惩罚
+      </div>
+      <div class="param-row">
+        <div class="param-label">
+          <span class="param-name">Repetition penalty</span>
+          <span class="param-val" id="val-rep">1.3</span>
+        </div>
+        <input type="range" min="1.0" max="2.0" step="0.1" value="1.3" id="slider-rep"
+          oninput="updateVal('rep', this.value, 1)">
+        <div class="param-desc">越大越抑制重复，1.0 = 不惩罚</div>
+      </div>
+    </div>
+
+    <div class="param-section">
+      <button class="reset-btn" onclick="applyPreset('balanced', null)">
+        <i class="ti ti-refresh" style="font-size:12px;vertical-align:-1px" aria-hidden="true"></i> 恢复默认
+      </button>
+    </div>
+  </aside>
 </div>
 
 <script>
   const panels = ['pretrain', 'classify', 'instruct'];
   const busy = { pretrain: false, classify: false, instruct: false };
 
+  const PRESETS = {
+    conservative: { tokens: 40,  temp: 0.5, topk: 20, rep: 1.5 },
+    balanced:     { tokens: 50,  temp: 0.6, topk: 40, rep: 1.3 },
+    creative:     { tokens: 120, temp: 1.2, topk: 80, rep: 1.1 },
+  };
+
+  // ── 历史记录 ──
+  async function loadHistory() {
+    try {
+      const res = await fetch('/api/history');
+      const history = await res.json();
+      panels.forEach(panel => {
+        if (history[panel] && history[panel].length > 0) {
+          history[panel].forEach(item => {
+            appendMsg(panel, item.role, item.text, false, item.time);
+          });
+        }
+      });
+    } catch (e) {
+      console.warn('加载历史记录失败', e);
+    }
+  }
+
+  async function saveMsg(panel, role, text) {
+    try {
+      await fetch('/api/history/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ panel, role, text }),
+      });
+    } catch (e) {
+      console.warn('保存记录失败', e);
+    }
+  }
+
+  async function clearHistory() {
+    const activeNav = document.querySelector('.nav-item.active');
+    const panel = activeNav.id.replace('nav-', '');
+    if (!confirm(`确定清空「${panel}」的历史记录吗？`)) return;
+    await fetch('/api/history/clear', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ panel }),
+    });
+    const area = document.getElementById('chat-' + panel);
+    area.innerHTML = '';
+    const welcome = document.getElementById('welcome-' + panel);
+    if (welcome) { welcome.style.display = ''; area.appendChild(welcome); }
+  }
+
+  // ── 参数 ──
+  function getParams() {
+    return {
+      max_new_tokens:     parseInt(document.getElementById('slider-tokens').value),
+      temperature:        parseFloat(document.getElementById('slider-temp').value),
+      top_k:              parseInt(document.getElementById('slider-topk').value),
+      repetition_penalty: parseFloat(document.getElementById('slider-rep').value),
+    };
+  }
+
+  function updateVal(key, val, decimals = 0) {
+    document.getElementById('val-' + key).textContent =
+      decimals ? parseFloat(val).toFixed(decimals) : val;
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  }
+
+  function applyPreset(name, btn) {
+    const p = PRESETS[name];
+    document.getElementById('slider-tokens').value = p.tokens;
+    document.getElementById('slider-temp').value   = p.temp;
+    document.getElementById('slider-topk').value   = p.topk;
+    document.getElementById('slider-rep').value    = p.rep;
+    document.getElementById('val-tokens').textContent = p.tokens;
+    document.getElementById('val-temp').textContent   = p.temp.toFixed(1);
+    document.getElementById('val-topk').textContent   = p.topk;
+    document.getElementById('val-rep').textContent    = p.rep.toFixed(1);
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+  }
+
+  // ── 面板切换 ──
   function switchPanel(id, btn) {
     panels.forEach(p => {
       document.getElementById('panel-' + p).classList.remove('active');
@@ -317,57 +534,74 @@
 
   function fillInput(panel, text) {
     const ta = document.getElementById('input-' + panel);
-    ta.value = text;
+    ta.value = text; autoResize(ta); ta.focus();
+  }
+
+  function fillInputWithData(panel, instruction, inputText) {
+    const ta = document.getElementById('input-' + panel);
+    ta.value = instruction;
     autoResize(ta);
     ta.focus();
+    window._pendingInput = window._pendingInput || {};
+    window._pendingInput[panel] = inputText;
   }
 
   function autoResize(ta) {
     ta.style.height = 'auto';
-    ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
+    ta.style.height = Math.min(ta.scrollHeight, 100) + 'px';
   }
 
   function handleKey(e, panel) {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(panel); }
   }
 
-  function appendMsg(panel, role, text, isLoading = false) {
+  // ── 消息渲染 ──
+  function appendMsg(panel, role, text, isLoading = false, time = null) {
     const area = document.getElementById('chat-' + panel);
     const welcome = document.getElementById('welcome-' + panel);
     if (welcome) welcome.style.display = 'none';
 
+    if (time) {
+      const ts = document.createElement('div');
+      ts.className = 'time-stamp';
+      ts.textContent = time;
+      area.appendChild(ts);
+    }
+
     const wrap = document.createElement('div');
     wrap.className = 'msg ' + role;
-
     const av = document.createElement('div');
     av.className = 'avatar ' + (role === 'user' ? 'user' : 'bot');
     av.textContent = role === 'user' ? '我' : 'AI';
-
     const bub = document.createElement('div');
     bub.className = 'bubble ' + (role === 'user' ? 'user' : 'bot') + (isLoading ? ' loading' : '');
     bub.textContent = text;
-
-    wrap.appendChild(av);
-    wrap.appendChild(bub);
+    wrap.appendChild(av); wrap.appendChild(bub);
     area.appendChild(wrap);
     area.scrollTop = area.scrollHeight;
     return bub;
   }
 
+  // ── 发送 ──
   async function send(panel) {
     if (busy[panel]) return;
     const ta = document.getElementById('input-' + panel);
     const text = ta.value.trim();
     if (!text) return;
-    ta.value = '';
-    autoResize(ta);
+    ta.value = ''; autoResize(ta);
+
+    const inputText = (window._pendingInput && window._pendingInput[panel]) || '';
+    window._pendingInput && (window._pendingInput[panel] = '');
+
     appendMsg(panel, 'user', text);
+    saveMsg(panel, 'user', text);
+
     busy[panel] = true;
     document.getElementById('btn-' + panel).disabled = true;
     const loadBub = appendMsg(panel, 'bot', '模型推理中…', true);
+    const params = getParams();
 
     try {
-      // ── 对接后端：把下面的 URL 换成 Flask 实际地址 ──
       const endpoint = {
         pretrain: '/api/pretrain',
         classify: '/api/classify',
@@ -377,13 +611,14 @@
       const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ text, input: inputText, ...params }),
       });
       const data = await res.json();
       loadBub.classList.remove('loading');
-      loadBub.textContent = data.result || '（无响应）';
+      const result = data.result || '（无响应）';
+      loadBub.textContent = result;
+      saveMsg(panel, 'bot', result);
     } catch (err) {
-      // 后端未启动时显示提示，不崩溃
       loadBub.classList.remove('loading');
       loadBub.textContent = '⚠️ 无法连接后端，请确认 Flask 服务已启动。\n\n错误：' + err.message;
     }
@@ -392,6 +627,9 @@
     document.getElementById('btn-' + panel).disabled = false;
     document.getElementById('chat-' + panel).scrollTop = 9999;
   }
+
+  // 页面加载时拉取历史
+  loadHistory();
 </script>
 </body>
 </html>

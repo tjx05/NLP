@@ -1,6 +1,62 @@
 import torch
 import torch.nn.functional as F
+import re
 
+def generate_json_response(model, tokenizer, instruction, input_text="",
+                           max_new_tokens=150, context_size=1024,
+                           temperature=0.3, top_k=20,
+                           repetition_penalty=1.2, device="cpu"):
+    """专用于 JSON 提取任务，生成后自动截断到合法 JSON 结尾"""
+    if input_text.strip():
+        prompt = (f"### Instruction:\n{instruction}\n\n"
+                  f"### Input:\n{input_text}\n\n"
+                  f"### Response:\n")
+    else:
+        prompt = f"### Instruction:\n{instruction}\n\n### Response:\n"
+
+    idx    = text_to_ids(prompt, tokenizer).to(device)
+    eos_id = tokenizer.encode("<|endoftext|>", allowed_special={"<|endoftext|>"})[0]
+
+    out = generate_temp_topk(model, idx, max_new_tokens, context_size,
+                             temp=temperature, top_k=top_k,
+                             eos_id=eos_id,
+                             repetition_penalty=repetition_penalty)
+
+    full_text = ids_to_text(out, tokenizer)
+    response  = full_text.split("### Response:\n")[-1].strip()
+
+    # ── 后处理：截断到合法 JSON 结尾 ──
+    response = _extract_clean_json(response)
+    return response
+
+
+def _extract_clean_json(text: str) -> str:
+    """从生成文本里提取第一个完整合法的 JSON 对象"""
+    # 找到第一个 { 开始
+    start = text.find("{")
+    if start == -1:
+        return text.strip()
+
+    # 从 { 开始，数括号深度，找到配对的 }
+    depth = 0
+    for i, ch in enumerate(text[start:], start):
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                # 找到配对的结尾，截断
+                candidate = text[start:i+1]
+                # 尝试验证是否是合法 JSON
+                try:
+                    import json
+                    json.loads(candidate)
+                    return candidate  # 合法，直接返回
+                except:
+                    return candidate  # 不合法也返回，至少截断了乱码
+
+    # 没找到配对的 }，返回从 { 开始的部分
+    return text[start:].strip()
 
 def generate_text_simple(model, idx, max_new_tokens, context_size):
     """
@@ -115,6 +171,8 @@ def ids_to_text(ids, tokenizer):
     flat = ids.squeeze(0)
     decoded = tokenizer.decode(flat.tolist())
     return decoded
+
+
 
 # import tiktoken
 # from src.models.gpt_model import GPTModel
