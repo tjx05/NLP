@@ -69,7 +69,7 @@ def build_classify_model(checkpoint_name):
         num_layers=cfg.num_layers
     ).to(cfg.device)
 
-    # 将生成头切断，换成二分类头
+    # 将生成头换成二分类头
     model.output = nn.Linear(cfg.embedding_dim, 2, bias=False).to(cfg.device)
 
     path = os.path.join(os.path.dirname(__file__), "checkpoints", checkpoint_name)
