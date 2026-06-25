@@ -620,7 +620,7 @@
       saveMsg(panel, 'bot', result);
     } catch (err) {
       loadBub.classList.remove('loading');
-      loadBub.textContent = '⚠️ 无法连接后端，请确认 Flask 服务已启动。\n\n错误：' + err.message;
+      loadBub.textContent = ' 无法连接后端，请确认 Flask 服务已启动。\n\n错误：' + err.message;
     }
 
     busy[panel] = false;

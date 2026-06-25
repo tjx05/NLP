@@ -34,7 +34,7 @@ def download_and_prepare_data():
     print("正在处理数据与划分数据集...")
     df = pd.read_csv(data_file_path, sep="\t", header=None, names=["Label", "Text"])
     
-    # 欠采样使得正负样本平衡 (原书逻辑)
+    # 欠采样使得正负样本平衡 
     num_spam = df[df["Label"] == "spam"].shape[0]
     ham_subset = df[df["Label"] == "ham"].sample(num_spam, random_state=123)
     balanced_df = pd.concat([ham_subset, df[df["Label"] == "spam"]])
@@ -59,7 +59,7 @@ def download_and_prepare_data():
     train_df.to_csv(train_csv_path, index=False)
     val_df.to_csv(val_csv_path, index=False)
     
-    print(f"✅ 数据准备完毕！")
+    print(f"数据准备完毕！")
     print(f"训练集已保存至: {train_csv_path} (共 {len(train_df)} 条)")
     print(f"验证集已保存至: {val_csv_path} (共 {len(val_df)} 条)")
 

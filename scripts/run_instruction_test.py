@@ -54,7 +54,7 @@ def load_model(checkpoint_name):
 
     checkpoint_path = os.path.join(BASE_DIR, "checkpoints", checkpoint_name)
     if not os.path.exists(checkpoint_path):
-        print(f"  ⚠️  找不到权重文件: {checkpoint_path}，跳过")
+        print(f" 找不到权重文件: {checkpoint_path}，跳过")
         return None
 
     model.load_state_dict(torch.load(checkpoint_path, map_location=cfg.device, weights_only=True))

@@ -24,7 +24,7 @@ from src.utils.generation import generate_temp_topk, text_to_ids, ids_to_text
 
 if __name__=="__main__":
     # ---------------------------------------------------------
-    # 1. 初始化 DDP (分布式通信)
+    #初始化 DDP (分布式通信)
     # ---------------------------------------------------------
     dist.init_process_group(backend='nccl')
     local_rank = int(os.environ["LOCAL_RANK"])
@@ -41,7 +41,7 @@ if __name__=="__main__":
     tokenizer = tiktoken.get_encoding('gpt2')
     
     # ---------------------------------------------------------
-    # 2. 挂载数据集
+    # 挂载数据集
     # ---------------------------------------------------------
     if master_process: print("正在挂载数据集 (分布式 Memmap 模式)...")
     bin_file_path = './data/processed/train.bin'
@@ -54,7 +54,7 @@ if __name__=="__main__":
     )
 
     # ---------------------------------------------------------
-    # 3. 创建模型并使用 DDP 包裹
+    # 创建模型并使用 DDP 包裹
     # ---------------------------------------------------------
     model = GPTModel(
         vocab_size=cfg.vocab_size,
@@ -70,7 +70,7 @@ if __name__=="__main__":
     checkpoint_path = "./checkpoints/epoch_1.pth"
     if os.path.exists(checkpoint_path):
         if master_process:
-            print(f"✅ 加载第1轮模型，从第2轮开始训练")
+            print(f"加载第1轮模型，从第2轮开始训练")
         model.load_state_dict(torch.load(checkpoint_path, map_location=device))
 
     model = DDP(model, device_ids=[local_rank])
@@ -99,7 +99,7 @@ if __name__=="__main__":
         print(f" 每张卡分配的 Batch 数量预估: {len(train_loader):,}\n")
 
     # ---------------------------------------------------------
-    # 4. 训练主循环
+    # 训练主循环
     # ---------------------------------------------------------
     global_step = 0  # 跨epoch的全局步数，用于lr调度
 
@@ -153,7 +153,7 @@ if __name__=="__main__":
         avg_train_loss = epoch_loss / num_batches
         
         # ---------------------------------------------------------
-        # 5. 验证与生成测试
+        # 验证与生成测试
         # ---------------------------------------------------------
         model.eval()
         with torch.no_grad():
@@ -173,7 +173,7 @@ if __name__=="__main__":
                 best_val_loss = min(history["val_loss"])
                 if not os.path.exists(best_model_path) or val_loss <= best_val_loss:
                     torch.save(model.module.state_dict(), best_model_path)
-                    print(f"✅ 已更新【最佳模型】best.pth | val_loss = {val_loss:.4f}")
+                    print(f"已更新【最佳模型】best.pth | val_loss = {val_loss:.4f}")
 
                 encoded = text_to_ids(start_context, tokenizer).to(device)
                 out = generate_temp_topk(model.module, idx=encoded, max_new_tokens=50, context_size=cfg.context_len, temp=1.0, top_k=50)

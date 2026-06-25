@@ -125,7 +125,7 @@ def train():
     model.load_state_dict(torch.load(START_CKPT, map_location=device, weights_only=True))
     print("权重加载完毕，开始继续微调...")
 
-    # 4. 优化器：lr 比上一阶段再小一点，避免覆盖已学知识
+    # 4. 优化器
     optimizer = torch.optim.AdamW(model.parameters(), lr=2e-5, weight_decay=0.01)
     scheduler = warmup_scheduler(optimizer, warmup_steps=100)
 

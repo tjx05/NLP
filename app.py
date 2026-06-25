@@ -58,7 +58,7 @@ def build_model(checkpoint_name):
 
 
 def build_classify_model(checkpoint_name):
-    """专门用于加载分类微调模型（判别式）"""
+    """专门用于加载分类微调模型"""
     model = GPTModel(
         vocab_size=cfg.vocab_size,
         embed_dim=cfg.embedding_dim,
@@ -69,7 +69,7 @@ def build_classify_model(checkpoint_name):
         num_layers=cfg.num_layers
     ).to(cfg.device)
 
-    # 核心改造：将生成头切断，换成二分类头
+    # 将生成头切断，换成二分类头
     model.output = nn.Linear(cfg.embedding_dim, 2, bias=False).to(cfg.device)
 
     path = os.path.join(os.path.dirname(__file__), "checkpoints", checkpoint_name)
@@ -81,7 +81,7 @@ def build_classify_model(checkpoint_name):
 
 pretrain_model = build_model("epoch_3.pth")
 instruct_model = build_model("begin_json_epoch5.pt")
-classify_model  = build_classify_model("classifier_finetuned.pth") # 【新增】：加载你的分类权
+classify_model  = build_classify_model("classifier_finetuned.pth") # 加载分类权
 print("模型加载完毕，服务启动中...")
 
 
@@ -218,9 +218,9 @@ def api_classify():
     spam_prob = probs[1].item() * 100
 
     if pred_label == 1:
-        res_str = f"🚫 垃圾/钓鱼信息 (Spam)\n\n【底层置信度】\n正常: {ham_prob:.2f}%\n垃圾: {spam_prob:.2f}%"
+        res_str = f"垃圾/钓鱼信息 (Spam)\n\n【底层置信度】\n正常: {ham_prob:.2f}%\n垃圾: {spam_prob:.2f}%"
     else:
-        res_str = f"✅ 正常安全信息 (Ham)\n\n【底层置信度】\n正常: {ham_prob:.2f}%\n垃圾: {spam_prob:.2f}%"
+        res_str = f"正常安全信息 (Ham)\n\n【底层置信度】\n正常: {ham_prob:.2f}%\n垃圾: {spam_prob:.2f}%"
 
     return jsonify({"result": res_str})
 

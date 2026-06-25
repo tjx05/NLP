@@ -10,7 +10,7 @@ from functools import partial
 import tiktoken
 import matplotlib.pyplot as plt
 import matplotlib
-matplotlib.use('Agg')  # 非交互模式，保存图片不弹窗
+matplotlib.use('Agg')  
 
 from config import cfg
 from src.models.gpt_model import GPTModel

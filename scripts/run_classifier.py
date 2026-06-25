@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.metrics import classification_report, confusion_matrix 
 
-# 将项目根目录加入系统路径，确保能顺利导入 src 和 config
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.utils.cls_finetune import load_and_modify_cls_model
@@ -93,7 +93,7 @@ def train():
     epochs = cfg.epochs
     print(" 分类微调正式启动...")
     for epoch in range(epochs):
-        epoch_start_time = time.time() # 【新增】记录本轮开始时间
+        epoch_start_time = time.time() # 记录本轮开始时间
         model.train()
         
         for step, (inputs, targets) in enumerate(train_loader):
@@ -129,7 +129,7 @@ def train():
     os.makedirs("checkpoints", exist_ok=True)
     save_path = "checkpoints/classifier_finetuned1.pth"
     torch.save(model.state_dict(), save_path)
-    print(f"🎉 模型权重已安全保存至: {save_path}")
+    print(f"模型权重已安全保存至: {save_path}")
 
     # ================= 深度评估报告输出 =================
     print("\n" + "="*50)

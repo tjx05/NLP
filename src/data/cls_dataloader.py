@@ -4,9 +4,7 @@ from torch.utils.data import Dataset, DataLoader
 import tiktoken
 
 class ClsDataset(Dataset):
-    """
-    分类任务专属数据集，支持自动向右 Padding 对齐
-    """
+
     def __init__(self, csv_file, tokenizer, max_length=None, pad_token_id=50256):
         # 要求 csv 包含 "Text" 和 "Label" 两列
         self.df = pd.read_csv(csv_file)

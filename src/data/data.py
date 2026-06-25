@@ -60,7 +60,7 @@ def build_5b_dataset(target_tokens=5_000_000_000):
                 
     f.close()
     total_pbar.close()
-    print("✅ 5B语料全量拉取完成！")
+    print("5B语料全量拉取完成！")
 
 def load_instruction_data(path="D:/NLP/NLP/data/raw/instruction_data.json"):
     #下载并加载指令数据集（教材配套，约1100条）
@@ -89,7 +89,6 @@ def load_alpaca_data(path="data/raw/alpaca_data.json"):
 def load_alpaca_cleaned_data(path="data/raw/alpaca_cleaned.json"):
     """
     Alpaca-Cleaned: 社区清洗版，约52000条，去除了噪声和重复样本
-    比原版Alpaca质量明显更高
     """
     import urllib.request, os, json
     url = "https://raw.githubusercontent.com/gururise/AlpacaDataCleaned/main/alpaca_data_cleaned.json"

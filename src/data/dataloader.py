@@ -18,7 +18,7 @@ class GPTDataset(Dataset):
             self.data=full_data[split_idx:]
             
         self.max_len=max_len
-        # stride 默认等于 max_len，即不重叠切分（最常用）
+        # stride 默认等于 max_len
         self.stride=stride if stride is not None else max_len
 
     def __len__(self):
@@ -38,13 +38,12 @@ def create_dataloader(bin_file, split="train", batch_size=32, max_len=1024,
                       shuffle=True, pin_memory=True, is_distributed=False, stride=None):
     dataset = GPTDataset(bin_file, max_len, split=split, stride=stride)
     
-    # 如果是分布式训练，使用分布式采样器
     sampler = DistributedSampler(dataset, shuffle=shuffle) if is_distributed else None
     
     dataloader = DataLoader(
         dataset,
         batch_size=batch_size,
-        shuffle=False if is_distributed else shuffle, # 如果用了 sampler，必须把 Dataloader 的 shuffle 设为 False
+        shuffle=False if is_distributed else shuffle, 
         sampler=sampler,
         pin_memory=pin_memory,
         num_workers=0,

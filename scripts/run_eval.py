@@ -1,4 +1,3 @@
-# scripts/run_eval.py
 import sys, os
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -25,7 +24,7 @@ from src.data.data import load_alpaca_data
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 
-# ── 工具函数 ──────────────────────────────────────────────
+
 def load_gpt_model(checkpoint_name):
     model = GPTModel(
         vocab_size=cfg.vocab_size,
@@ -49,7 +48,7 @@ def section(title):
     print("=" * 55)
 
 
-# ── 1. 预训练评测（PPL + Distinct）────────────────────────
+# ── 预训练评测（PPL + Distinct）────────────────────────
 def eval_pretrain():
     section("预训练模型评测 — PPL + Distinct")
 
@@ -97,7 +96,7 @@ def eval_pretrain():
     return {"ppl": ppl, "distinct": distinct}
 
 
-# ── 2. 分类微调评测（Accuracy / Precision / Recall / F1）──
+# ──分类微调评测（Accuracy / Precision / Recall / F1）──
 def eval_classifier():
     section("分类微调评测 — Accuracy / Precision / Recall / F1")
 
@@ -105,7 +104,7 @@ def eval_classifier():
     val_csv = os.path.join(BASE_DIR, "data", "cls_raw", "validation.csv")
 
     if not os.path.exists(val_csv):
-        print(f"  ⚠️  找不到分类数据文件: {val_csv}，跳过分类评测")
+        print(f"    找不到分类数据文件: {val_csv}，跳过分类评测")
         return None
 
     GPT_CONFIG = {
@@ -139,7 +138,7 @@ def eval_classifier():
     return metrics
 
 
-# ── 3. 指令微调评测（双数据源分流：普通指令流 + JSON 定向流）────────────
+# ── 指令微调评测（双数据源分流：普通指令流 + JSON 定向流）────────────
 def eval_instruct():
     section("指令微调评测 — PPL / BLEU / 指令完成率 / JSON定向提取")
 
@@ -149,7 +148,7 @@ def eval_instruct():
     # 载入微调进化的终极大魔王权重
     model = load_gpt_model("begin_json_epoch5.pt")
 
-    # ==================== 🛠️ 数据源一：普通纯任务数据集（Alpaca） ====================
+    # ====================  数据源一：普通纯任务数据集（Alpaca） ====================
     # 用于测量：原有的 PPL、原有的 BLEU、原有的指令关键词完成率
     data = load_alpaca_data()
     data = [d for d in data if len(d["output"]) > 30]
@@ -160,11 +159,11 @@ def eval_instruct():
         dataset_normal, batch_size=8, shuffle=False, collate_fn=collate
     )
 
-    # 3-1. 基于普通通用任务计算 PPL
+    # 基于普通通用任务计算 PPL
     ppl = calc_perplexity(model, dataloader_normal, cfg.device)
     print(f"  标准指令微调 PPL (基于通用数据集): {ppl}")
 
-    # 3-2. 基于普通通用任务批量生成回答（服务于原有指标）
+    #基于普通通用任务批量生成回答（服务于原有指标）
     print("  正在生成通用任务测试回答（100条）...")
     normal_instructions, normal_references, normal_hypotheses = [], [], []
     for i, item in enumerate(test_data_normal):
@@ -185,7 +184,7 @@ def eval_instruct():
 
 
 
-    # 3-3. 精准回归：原有普通任务的指令完成率及其细分（数据重归纯净，分数不再崩坏）
+    #3-3. 精准回归：原有普通任务的指令完成率及其细分
     instr_scores = calc_instruction_corpus(normal_instructions, normal_hypotheses)
     print(f"  指令完成率（overall）: {instr_scores['overall']:.2%}")
     print(f"  各类别细分: {instr_scores}")

@@ -25,7 +25,7 @@ def load_finetuned_model(weights_path, device):
         num_layers=cfg.num_layers
     )
     
-    # 【核心逻辑】：先将模型改造成二分类结构，再加载微调后的权重
+    # 先将模型改造成二分类结构，再加载微调后的权重
     model.output = nn.Linear(cfg.embedding_dim, 2, bias=False)
     
     print(f"2. 正在加载微调后的权重: {weights_path} ...")
@@ -41,24 +41,24 @@ def classify_text(text, model, tokenizer, device, max_length=120, pad_token_id=5
     """
     对单条文本进行分类预测
     """
-    # 1. 文本转 Token ID
+    # 文本转 Token ID
     input_ids = tokenizer.encode(text)
     
-    # 2. 截断或填充至与训练时一致的长度 (120)
+    #截断或填充至与训练时一致的长度 (120)
     if len(input_ids) > max_length:
         input_ids = input_ids[:max_length]
     else:
         input_ids += [pad_token_id] * (max_length - len(input_ids))
         
-    # 3. 转为张量并增加 Batch 维度: [1, seq_len]
+    # 转为张量并增加 Batch 维度: [1, seq_len]
     input_tensor = torch.tensor(input_ids, dtype=torch.long, device=device).unsqueeze(0)
     
-    # 4. 前向传播
+    # 前向传播
     with torch.no_grad():
         logits = model(input_tensor)[:, -1, :] # 取出最后一个 Token 的输出
         predicted_label = torch.argmax(logits, dim=-1).item()
         
-    return "垃圾信息 (Spam) 🚫" if predicted_label == 1 else "正常信息 (Ham) ✅"
+    return "垃圾信息 (Spam) " if predicted_label == 1 else "正常信息 (Ham) "
 
 def main():
     device = torch.device(cfg.device)
@@ -90,7 +90,7 @@ def main():
         print(f"文本: {text}")
         print(f"预测: {result}\n")
         
-    # 允许你手动输入测试
+    # 允许手动输入测试
     while True:
         user_input = input("请输入你想测试的英文句子 (或输入 'quit' 退出): \n> ")
         if user_input.lower() in ['quit', 'q', 'exit']:

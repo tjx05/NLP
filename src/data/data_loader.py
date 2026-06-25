@@ -1,5 +1,5 @@
 """
-清洗获得的数据语料并分词-5B工业化改进版
+清洗获得的数据语料并分词
 """
 import tiktoken
 import os
@@ -8,7 +8,6 @@ from tqdm import tqdm
 import numpy as np
 
 def clean_text(text):
-    # 稍微减少打印次数，否则 1 亿行数据会刷屏
     text = re.sub(r'[\x00-\x08\x0b-\x0c\x0e-\x1f\x7f]', '', text)
     text = re.sub(r'\n{3,}', '\n\n', text)
     text = re.sub(r'[ \t]+', ' ', text)
@@ -37,7 +36,7 @@ def preprocess_and_save():
             file_path = os.path.join(input_dir, file_name)
             
             with open(file_path, "r", encoding="utf-8") as f:
-                # 每次只读取一个 1GB 的文件，内存非常安全
+                # 每次只读取一个 1GB 的文件
                 txt = f.read()
 
             # 执行清洗
@@ -48,7 +47,6 @@ def preprocess_and_save():
             total_tokens += len(token_ids)
 
             # 转换为 uint16 并直接写入二进制流
-            # uint16 占用 2 字节，比 torch.long (8 字节) 节省 75% 的磁盘空间
             token_np = np.array(token_ids, dtype=np.uint16)
             bin_file.write(token_np.tobytes())
 

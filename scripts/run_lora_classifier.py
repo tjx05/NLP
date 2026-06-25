@@ -54,7 +54,7 @@ def evaluate_comprehensive(model, data_loader, device):
             all_preds.extend(preds.cpu().numpy())
             all_targets.extend(targets.cpu().numpy())
             
-    # 假设 0: Normal(正常短信), 1: Spam(垃圾短信)。如果你的标签相反，请对调列表顺序
+    # 假设 0: Normal(正常短信), 1: Spam(垃圾短信)
     report = classification_report(all_targets, all_preds, target_names=['Normal', 'Spam'], digits=4)
     cm = confusion_matrix(all_targets, all_preds)
     
@@ -62,7 +62,7 @@ def evaluate_comprehensive(model, data_loader, device):
 
 def train():
     device = torch.device(cfg.device)
-    print(f"🔥 当前运行设备: {device}")
+    print(f"当前运行设备: {device}")
     
     # 1. 准备数据 
     train_csv = "data/cls_raw/train.csv"
@@ -101,9 +101,9 @@ def train():
 
     # 4. 训练核心循环
     epochs = cfg.epochs
-    print("🚀 LoRA 垃圾短信分类微调正式启动...")
+    print(" LoRA 垃圾短信分类微调正式启动...")
     for epoch in range(epochs):
-        epoch_start_time = time.time() # 【新增】记录本轮开始时间
+        epoch_start_time = time.time() # 记录本轮开始时间
         model.train()
         
         for step, (inputs, targets) in enumerate(train_loader):
@@ -131,8 +131,8 @@ def train():
         train_accuracies.append(train_acc * 100)
         val_accuracies.append(val_acc * 100)
         
-        epoch_end_time = time.time() # 【新增】记录本轮结束时间
-        # 【修改】打印信息加入了单轮耗时
+        epoch_end_time = time.time() # 记录本轮结束时间
+        # 打印信息加入了单轮耗时
         print(f"✨ Epoch {epoch+1} 评估 -> 训练集准确率: {train_acc*100:.2f}% | 验证集准确率: {val_acc*100:.2f}% | 耗时: {epoch_end_time - epoch_start_time:.2f} 秒")
         
     # 5. 保存权重
@@ -192,7 +192,7 @@ def train():
     plot_save_path = "output/lora_cls_training.png"
     plt.savefig(plot_save_path, dpi=300)
     plt.close()
-    print(f"🖼️ LoRA 可视化图表已成功保存至: {plot_save_path}")
+    print(f"LoRA 可视化图表已成功保存至: {plot_save_path}")
 
 if __name__ == "__main__":
     train()
