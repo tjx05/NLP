@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.metrics import classification_report, confusion_matrix # 用于深度评估
 
-# 动态将项目根目录加入系统路径，确保能找到 src 和 config
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.utils.lora_cls_finetune import load_and_modify_lora_cls_model
@@ -133,7 +132,7 @@ def train():
         
         epoch_end_time = time.time() # 记录本轮结束时间
         # 打印信息加入了单轮耗时
-        print(f"✨ Epoch {epoch+1} 评估 -> 训练集准确率: {train_acc*100:.2f}% | 验证集准确率: {val_acc*100:.2f}% | 耗时: {epoch_end_time - epoch_start_time:.2f} 秒")
+        print(f" Epoch {epoch+1} 评估 -> 训练集准确率: {train_acc*100:.2f}% | 验证集准确率: {val_acc*100:.2f}% | 耗时: {epoch_end_time - epoch_start_time:.2f} 秒")
         
     # 5. 保存权重
     save_dir = "checkpoints/lora_finetuned_spam"

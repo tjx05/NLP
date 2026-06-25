@@ -123,7 +123,7 @@ def train():
         
         epoch_end_time = time.time() # 记录本轮结束时间
         # 打印信息加入了单轮耗时
-        print(f"✨ Epoch {epoch+1} 评估 -> 训练集准确率: {train_acc*100:.2f}% | 验证集准确率: {val_acc*100:.2f}% | 耗时: {epoch_end_time - epoch_start_time:.2f} 秒")
+        print(f"Epoch {epoch+1} 评估 -> 训练集准确率: {train_acc*100:.2f}% | 验证集准确率: {val_acc*100:.2f}% | 耗时: {epoch_end_time - epoch_start_time:.2f} 秒")
         
     # 5. 保存模型权重
     os.makedirs("checkpoints", exist_ok=True)

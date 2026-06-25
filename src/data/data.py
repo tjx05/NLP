@@ -63,7 +63,7 @@ def build_5b_dataset(target_tokens=5_000_000_000):
     print("5B语料全量拉取完成！")
 
 def load_instruction_data(path="D:/NLP/NLP/data/raw/instruction_data.json"):
-    #下载并加载指令数据集（教材配套，约1100条）
+    #下载并加载指令数据集
     import urllib.request, os, json
     url = "https://raw.githubusercontent.com/rasbt/LLMs-from-scratch/main/ch07/01_main-chapter-code/instruction-data.json"
     if not os.path.exists(path):

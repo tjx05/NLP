@@ -86,7 +86,7 @@ if __name__=="__main__":
     epochs=cfg.epochs
     start_context='Every effort moves you'
     patience=5  # 早停耐心轮数
-    min_delta = 0.001     # 只有下降超过这个值才算改善
+    min_delta = 0.001    
     counter=0
 
     best_val_loss=float('inf')
