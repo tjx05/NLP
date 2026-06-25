@@ -5,7 +5,7 @@ import torch
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.metrics import classification_report, confusion_matrix # 用于深度评估
+from sklearn.metrics import classification_report, confusion_matrix
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -38,7 +38,7 @@ def evaluate_accuracy(model, data_loader, device):
             total += targets.size(0)
     return correct / total
 
-# 深度评估函数：输出 F1, Precision, Recall 和 混淆矩阵
+# 评估函数：输出 F1, Precision, Recall 和 混淆矩阵
 def evaluate_comprehensive(model, data_loader, device):
     model.eval()
     all_preds = []
@@ -140,7 +140,7 @@ def train():
     model.save_pretrained(save_dir) 
     print(f" LoRA 轻量级权重已安全保存至: {save_dir}")
 
-    # ================= 深度评估报告输出 =================
+    # ================= 评估报告输出 =================
     print("\n" + "="*50)
     print(" LoRA 微调：最终验证集深度评估报告 (Validation Report)")
     print("="*50)
